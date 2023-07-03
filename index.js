@@ -32,7 +32,7 @@ app.use('/v2/nba-platform/admin', require('./routes/admin/index'));
 app.use('/v2/nba-platform/admin/user', require('./routes/admin/user'));
 app.use('/v2/nba-platform/admin/member', require('./routes/admin/member'));
 app.use('/v2/nba-platform/admin/wallet', require('./routes/admin/wallet'));
-app.use('/v2/nba-platform/admin/withdraw',require('./routes/admin/withdraw'))
+app.use('/v2/nba-platform/admin/withdraw',require('./routes/admin/withdraw'));
 //Public
 app.use('/v2/nba-platform/public/member' ,require('./routes/public/member'));
 app.use('/v2/nba-platform/public/report', require('./routes/public/report'));
