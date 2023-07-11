@@ -74,6 +74,61 @@ exports.change_password = async (req, res) => {
   }
 };
 
+//Create member pin
+exports.createPin = async (req, res) => {
+  try {
+    const token = req.headers['token'];
+    const decoded = token_decode(token);
+    const salt = await bcrypt.genSalt(10);
+    const member_pin = await bcrypt.hash(req.body.member_pin,salt);
+     Member.findByIdAndUpdate(decoded._id,{member_pin:member_pin},{returnDocument:'after'},(err,result)=>{
+      if(err) {
+        console.log(err);
+        return res.status(403).send({status:false,message:'สร้าง pin ไม่สำเร็จ'})
+      }
+       return res.status(200).send({status:true,message:'สร้าง pin สำเร็จ'});
+
+     });
+  
+   
+    
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({message: "Server error: "});
+  }
+}
+
+// Verify member pin
+exports.verifyMemberPin = async (req,res) => {
+  try {
+    const token = req.headers['token'];
+    const decoded = token_decode(token);
+    const member = await Member.findOne({_id:decoded._id});
+    console.log(member);
+    if(!member){
+      return res.status(403).send({status:false,message:'ไม่มีผู้ใช้ในระบบ'});
+    }else{
+
+      console.log(req.body.member_pin,member.member_pin)
+
+       bcrypt.compare(req.body.member_pin,member.member_pin).then(result => {
+        console.log(result);
+        if(!result){
+          return res.status(403).send({status:false,message:'รหัสไม่ถูกต้อง'});
+        }else{
+
+          return res.status(200).send({status:true,message:'รหัสถูกต้อง',data:result})
+        }
+       })
+
+    }
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({message: "Server error"});
+  }
+}
+
 exports.verify_iden = async (req, res) => {
   try {
     //UPLOAD TO GOOGLE DRIVE
@@ -300,3 +355,4 @@ async function generatePublicUrl(res) {
     console.log(error.message);
   }
 }
+

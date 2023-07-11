@@ -1,10 +1,11 @@
 const router = require('express').Router();
-const member = require('../../controllers/public/member.controller')
+const Member = require('../../controllers/public/member.controller')
 const auth = require('../../middleware/auth.public');
 
-router.get('/tel/:tel', auth, member.getByTel);
-router.post('/givecommission', auth, member.giveCommission);
-router.post('/givehappypoint', auth, member.giveHappyPoint);
 
-router.post('/transfer_member', member.transferMember);
+router.get('/tel/:tel', auth, Member.getByTel);
+router.post('/givecommission', auth, Member.giveCommission);
+router.post('/givehappypoint', auth, Member.giveHappyPoint);
+
+router.post('/transfer_member', Member.transferMember);
 module.exports = router;

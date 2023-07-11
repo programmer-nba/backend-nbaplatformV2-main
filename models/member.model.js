@@ -15,6 +15,7 @@ const MemberSchema = new mongoose.Schema({
     wallet : {type: Number ,required: false, default: 0},   //ยอดเงินในกระเป๋าอิเล็กทรอนิกส์
     money : {type: Number, required : false, default : 0 },  //ยอดรายได้สะสม
     passcode : {type:Number, required: false, default: ''},
+    member_pin:{type:String},
     profile_image : {type: Number, required: false, default: ''},
     happy_point : {type: Number, required: false, default: 0},
     bank : {

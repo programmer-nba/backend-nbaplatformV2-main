@@ -39,6 +39,12 @@ app.use('/v2/nba-platform/public/report', require('./routes/public/report'));
 
 //SMS
 app.use('/v2/nba-platform/sms/otp', require('./routes/sms/otp'));
+
+//Counter service
+app.use('/v2/nba-platform/counter_service/mobile_topup',require('./routes/counterservice/mobile.topup'));
+app.use('/v2/nba-platform/counter_service/card_topup',require('./routes/counterservice/card.topup'));
+
+//
 const port = process.env.PORT || 9010;
 app.listen(port, ()=>{
     console.log(`API Runing PORT ${port}`);
