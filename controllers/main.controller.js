@@ -21,6 +21,9 @@ const vali_register = (data)=>{
         district : Joi.string().required().label('กรุณากรอกเขต/อำเภอ'),
         province : Joi.string().required().label('กรุณากรอกจังหวัด'),
         postcode : Joi.string().required().label('กรุณากรอกรหัสไปรษณีย์'),
+        partner_group:Joi.string(),
+        partner_shop_name:Joi.string(),
+        partner_shop_address:Joi.string(),
         timestamp : Joi.string().required().label('ไม่พบเวลาที่สมัคร'),
         money : Joi.number().default(0)
     })
@@ -52,7 +55,7 @@ exports.register = async(req, res)=>{
                     lv2 : memberRef.upline.lv1,
                     lv3 : memberRef.upline.lv2
                 }
-                first_money = 15
+                first_money = 0 //ยังไม่ให้เงินเริ่มต้น
                 data = {...req.body,money: first_money-((first_money*7)/100), card_number:card_number, password: encrytedPassword, upline : upline}
                 
             }else{

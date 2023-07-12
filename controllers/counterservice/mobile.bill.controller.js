@@ -3,8 +3,34 @@ const CheckUserWallet = require('../../lib/checkwallet');
 const {WalletHistory} = require('../../models/wallet.history.model');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
 
-//STOP 1 - Check
-module.exports.Check = async (req,res) => {
+//START 1 - check
+module.exports.Check = async (req,res)=>{
+    try {
+        var axios = require('axios');
+        const dataRequest = {
+            productid:req.body.productid,
+            mobile: req.body.mobile
+        }
+        const request = {
+            method:'post',
+            headers:{
+                'auth-token':process.env.SHOP_API_TOKEN,
+            },
+            url:`${process.env.SHOP_API}/counter_service/mobile_bill/check`,
+            data:dataRequest
+        } 
+        await axios(request).then(response => {
+                    return res.status(200).send({message:'เช็คข้อมูลสำเร็จ',data:response.data});
+                })
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({message:'Server error'});
+    }
+}
+
+//STEP 2 - Recieved Transaction
+module.exports.GetTransection = async (req,res) => {
     try {
     const token = req.headers['token'];
 
@@ -52,7 +78,7 @@ await axios(request).then(response => {
 }
 
 
-//STEP 2 - Confirm
+//STEP 3 - Confirm
 module.exports.Confirm = async (req,res) => {
     try {
 

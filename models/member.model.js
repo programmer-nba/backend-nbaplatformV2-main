@@ -11,6 +11,9 @@ const MemberSchema = new mongoose.Schema({
     district : {type: String, required: true},
     province : {type: String, required: true},
     postcode : {type: String, required: true},
+    partner_group:{type:String},
+    partner_shop_name:{type:String},
+    partner_shop_address:{type:String},
     allsale : {type: Number, required: false, default: 0},  //ยอดสะสมจากยอดขาย
     wallet : {type: Number ,required: false, default: 0},   //ยอดเงินในกระเป๋าอิเล็กทรอนิกส์
     money : {type: Number, required : false, default : 0 },  //ยอดรายได้สะสม
@@ -53,6 +56,9 @@ const validate = (data)=>{
         district : Joi.string().required().label('ไม่พบ เขต/อำเภอ'),
         province : Joi.string().required().label('ไม่พบจังหวัด'),
         postcode : Joi.string().required().label('ไม่พบรหัส ปณ.'),
+        partner_group:Joi.string(),
+        partner_shop_name:Joi.string(),
+        partner_shop_address:Joi.string(),
         wallet : Joi.number().default(0),
         money : Joi.number().default(0),
         passcode : Joi.string().default(''),

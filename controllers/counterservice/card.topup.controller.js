@@ -56,7 +56,7 @@ module.exports.Confirm = async (req,res) => {
         profit_nba : req.body.profit_nba,
         profit_shop : req.body.profit_shop,
         cost : req.body.cost,
-        employee : 'nba partner',
+        employee : 'Platform-member',
         transid : req.body.transid,
         timestamp: `${new Date()}`
  
