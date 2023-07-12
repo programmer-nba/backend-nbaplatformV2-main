@@ -67,9 +67,12 @@ module.exports.Confirm = async (req,res) => {
             if(userWallet < req.body.price){
                 return res.status(403).send({message:'มีเงินไม่เพียงพอ'});
             }else{
-                console.log(`${decoded._id} ต้องการทำรายการเติมเงินมือถือ`)
+                console.log(`${decoded._id} ต้องการคอนเฟิร์มทำรายการเติมเงินมือถือ`)
             }
 
+            //กำไร NBA 0.5 % ของราคาขาย
+            const profit_nba = req.body.price * 0.5 / 100;
+            const cost = req.body.price - (req.body.price * 2.5 / 100);
 
         const requestdata = {
 
@@ -78,12 +81,12 @@ module.exports.Confirm = async (req,res) => {
             type : "เติมเงินมือถือ",
             mobile : req.body.mobile,
             price : req.body.price,
-            charge : req.body.charge,
-            receive : (req.body.price + req.body.charge + req.body.profit_nba + req.body.profit_shop),
+            charge : 0,
+            receive : cost,
             transid: req.body.transid,
-            profit_nba: (req.body.profit_nba + req.body.profit_shop),
+            profit_nba: profit_nba,
             profit_shop: 0,
-            cost: req.body.cost,
+            cost: cost,
             employee : "Platform-member",
             timestamp : `${new Date()}`
  
@@ -102,12 +105,17 @@ module.exports.Confirm = async (req,res) => {
         data:requestdata
     }
     await axios(request).then(async response => {
+        console.log('response data',response.data);
+        console.log('response detail',response.data.data.detail);
         //create wallet history
+        if(response.data.data.detail.error_code !=="E00"){
+            return res.status(403).send({status:false,code:response.data.data.error_code,data:response.data.data});
+        }
         let percent =3;
-        if(response.data.data.productid ==="p00003" || response.data.data.productid === "p00016"){
+        if(response.data.data.detail.productid ==="p00003" || response.data.data.detail.productid === "p00016"){
             percent = 2;
         }
-        const debitAmount = response.data.data.price + (response.data.data.price*percent/100)
+        const debitAmount = response.data.data.detail.price - (response.data.data.detail.price*(percent-0.5)/100)
    
         const debitData = {
             mem_id:decoded._id,
@@ -119,12 +127,21 @@ module.exports.Confirm = async (req,res) => {
 
         }
 
-      await DebitWallet(token,debitData).then(result=>{
-        console.log('debite wallet result: ',result);
-      })
-       
-        return res.status(200).send(response.data);
-    })
+      
+      await DebitWallet(token,debitData);
+            
+            return res.status(200).send({
+                status:true,
+                data:{
+                    serviceid:response.data.data.detail.productid,
+                    service_name:response.data.data.detail.productname,
+                    price:response.data.data.detail.price,
+                    discount:response.data.data.detail.price*2.5/100,
+                    debit:response.data.data.cost,
+                    remainding_wallet:(userWallet - response.data.data.cost)               
+                }})
+        })
+
     .catch(error=>{
         console.error(error);
         return res.status(403).send({code:error.code,data:error.message});

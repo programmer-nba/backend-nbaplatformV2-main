@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
-const {WalletHistory} = require('../../models/wallet.history.model');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
 
 //START 1 - check
@@ -133,7 +132,7 @@ module.exports.Confirm = async (req,res) => {
         if(response.data.data.productid ==="p00003" || response.data.data.productid === "p00016"){
             percent = 2;
         }
-        const debitAmount = response.data.data.price + (response.data.data.price*percent/100)
+        const debitAmount = response.data.data.price - (response.data.data.price*(percent - 0.5)/100)
    
         const debitData = {
             mem_id:decoded._id,
