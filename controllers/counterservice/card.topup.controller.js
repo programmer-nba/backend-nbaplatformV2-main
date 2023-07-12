@@ -114,7 +114,7 @@ module.exports.Confirm = async (req,res) => {
 
             const debitData = {
                 mem_id:decoded._id,
-                name:`service card topup ${response.data.invoice}`,
+                name:`service card topup ${response.data.data.invoice}`,
                 type:"ออก",
                 amount:debitAmount,
                 detail:`${JSON.stringify(response.data.data.detail)}`,
