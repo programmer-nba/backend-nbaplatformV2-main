@@ -45,6 +45,7 @@ app.use('/v2/nba-platform/counter_service/mobile_topup',require('./routes/counte
 app.use('/v2/nba-platform/counter_service/card_topup',require('./routes/counterservice/card.topup'));
 app.use('/v2/nba-platform/counter_service/mobile_bill',require('./routes/counterservice/mobile.bill'));
 app.use('/v2/nba-platform/counter_service/barcode_service',require('./routes/counterservice/barcode'));
+app.use('/v2/nba-platform/counter_service/nba_service',require('./routes/counterservice/nba'));
 
 //
 const port = process.env.PORT || 9010;
