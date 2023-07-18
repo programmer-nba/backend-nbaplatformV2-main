@@ -5,6 +5,18 @@ const { DebitWallet} = require('../../lib/transection/debit.wallet');
 //START 1 - check
 module.exports.Check = async (req,res)=>{
     try {
+
+        const token = req.headers['token'];
+
+        const decoded = jwt.verify(token,process.env.TOKEN_KEY);
+    
+        const userWallet = await CheckUserWallet(decoded._id);
+            console.log(userWallet);
+    
+            if(userWallet < req.body.price){
+                return res.status(403).send({message:'มีเงินไม่เพียงพอ'});
+            }
+            
         var axios = require('axios');
         const dataRequest = {
             productid:req.body.productid,

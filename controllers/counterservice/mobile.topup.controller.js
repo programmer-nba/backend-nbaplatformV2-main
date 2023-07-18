@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
-const {WalletHistory} = require('../../models/wallet.history.model');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
 
 //STOP 1 - Check
@@ -63,16 +62,22 @@ module.exports.Confirm = async (req,res) => {
     
         const userWallet = await CheckUserWallet(decoded._id);
             console.log(userWallet);
-    
-            if(userWallet < req.body.price){
+            const price = Number(req.body.price);
+            if(userWallet < price){
                 return res.status(403).send({message:'มีเงินไม่เพียงพอ'});
             }else{
                 console.log(`${decoded._id} ต้องการคอนเฟิร์มทำรายการเติมเงินมือถือ`)
             }
 
             //กำไร NBA 0.5 % ของราคาขาย
-            const profit_nba = req.body.price * 0.5 / 100;
-            const cost = req.body.price - (req.body.price * 2.5 / 100);
+            const profit_nba = price * 0.5 / 100;
+
+            const discount = {
+                "p00001":2.5,
+                "p00002":2.5,
+                "p00003":1.5
+            }
+            const cost = price - (price * 2.5 / 100);
 
         const requestdata = {
 
@@ -80,7 +85,7 @@ module.exports.Confirm = async (req,res) => {
             payment_type : "wallet",
             type : "เติมเงินมือถือ",
             mobile : req.body.mobile,
-            price : req.body.price,
+            price : price,
             charge : 0,
             receive : cost,
             transid: req.body.transid,

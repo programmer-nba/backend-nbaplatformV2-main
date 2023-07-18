@@ -43,9 +43,9 @@ module.exports.Verify = async (req,res) => {
 
         const userWallet = await CheckUserWallet(decoded._id);
 
-        if(userWallet < req.body.price){
-            return res.status(403).send({message:"มีเงินไม่เพียงพอ"})
-        }
+        // if(userWallet < req.body.price){
+        //     return res.status(403).send({message:"มีเงินไม่เพียงพอ"})
+        // }
 
         const axios = require('axios');
         const requestdata = {
@@ -69,7 +69,15 @@ module.exports.Verify = async (req,res) => {
         }
 
         await axios(request).then(response => {
-            return res.status(200).send(response.data);
+
+            const price = Number(req.body.price);
+
+            if(userWallet < price){
+                return res.status(403).send({message:"มีเงินไม่เพียงพอ"})
+            }else{
+
+                return res.status(200).send(response.data);
+            }
         })
         .catch(error => {
             return res.status(400).send(error.message);
@@ -88,13 +96,15 @@ module.exports.Confirm = async (req,res) => {
 
         const userWallet = await CheckUserWallet(decoded._id);
 
-        if(userWallet < req.body.price){
+        const price = Number(req.body.price);
+
+        if(userWallet < price){
             return res.status(403).send({message:"มีเงินไม่เพียงพอ"})
         }
 
         const axios = require('axios');
 
-        const debitValue = req.body.price + req.body.charge
+        const debitValue = price + req.body.charge
         const requestdata = {
             
                 shop_id : decoded._id,

@@ -31,16 +31,20 @@ module.exports.CreatePreOrder = async (req,res) => {
          //UPLOAD TO GOOGLE DRIVE
          const token = req.headers['token'];
          const decoded = jwt.verify(token,process.env.TOKEN_KEY)
-         const userWallet = CheckUserWallet(decoded._id);
-
-         if(userWallet<req.body.price){
-            return res.status(403).send({message:"มีเงินไม่เพียงพอ"});
-         }
-
+         
     let upload = multer({storage: storage}).fields([
         {name: "ref_image", maxCount: 10},
       ]);
       upload(req, res, async function (err) {
+
+        const userWallet = await CheckUserWallet(decoded._id);
+
+        const price = Number(req.body.price);
+
+         if(userWallet<price || userWallet<=0){
+            return res.status(403).send({message:"มีเงินไม่เพียงพอ"});
+         }
+
 
         if (req.files.ref_image) {
           console.log("มีรูปเข้ามา");
@@ -57,6 +61,7 @@ module.exports.CreatePreOrder = async (req,res) => {
             productid : req.body.productid,
             productname :req.body.productname,
             shop_id: decoded._id,
+            mobile:req.body.mobile,
             payment_type:'wallet',
             detail:{
                 note: req.body.note,
@@ -67,8 +72,8 @@ module.exports.CreatePreOrder = async (req,res) => {
             charge: charge,
             cost_nba:cost_nba,
             cost_shop:cost_shop,
-            price : req.body.price, 
-            receive:(Number(req.body.price) + cost_nba + charge),
+            price : price, 
+            receive:(price + cost_nba + charge),
             image: image.id, //image on googledive
             timestamp:new Date()
         }
