@@ -48,6 +48,9 @@ app.use('/v2/nba-platform/counter_service/barcode_service',require('./routes/cou
 app.use('/v2/nba-platform/counter_service/nba_service',require('./routes/counterservice/nba'));
 app.use('/v2/nba-platform/counter_service/wallet',require('./routes/counterservice/wallet'));
 
+//artwork
+app.use('/v2/nba-platform/artwork',require('./routes/artwork/artwork'));
+
 //
 const port = process.env.PORT || 9010;
 app.listen(port, ()=>{
