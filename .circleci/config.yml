@@ -6,11 +6,15 @@ jobs:
       steps:
          - run: ssh -oStrictHostKeyChecking=no -v  $SERVER_USER@$SERVER_IP "./deploy-backend-nbaplatformV2-main.sh"
 workflows:
-version: 2
-   build&&deploy:
-      jobs:
-         - deploy:
-      filters:
-         branches:
-            only: mian
+ version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy-prod:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - build
 
