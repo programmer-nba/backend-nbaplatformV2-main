@@ -17,5 +17,9 @@ jobs:
 workflows:
   build-project:
     jobs:
-      - pull-and-build
+      - pull-and-build:
+          filters:
+            branches:
+              only:
+                - main
           
