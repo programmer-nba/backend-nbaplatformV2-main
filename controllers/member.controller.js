@@ -89,8 +89,6 @@ exports.createPin = async (req, res) => {
        return res.status(200).send({status:true,message:'สร้าง pin สำเร็จ'});
 
      });
-  
-   
     
   } catch (error) {
     console.error(error);

@@ -102,7 +102,15 @@ exports.login = async(req, res)=>{
         const member = await Member.findOne({tel});
         if(member && (await bcrypt.compare(password, member.password))){
             console.log('เข้าสู่ระบบสำเร็จ');
-            const token = jwt.sign({_id:member._id, auth: 'member'}, `${process.env.TOKEN_KEY}`)
+            const payload = {
+                _id:member._id,
+                 auth: 'member',
+                 name:member.name,
+                 tel:member.tel
+
+            }
+
+            const token = jwt.sign(payload, `${process.env.TOKEN_KEY}`)
             await LoginHistory.create({mem_id: member._id, ip_address: ip_address, timestamp: dayjs(Date.now()).format()})
             await TokenList.create({mem_id: member._id, token: token, timestamp: dayjs(Date.now()).format()})
             return res.status(200).send({status: true, token : token});

@@ -12,6 +12,7 @@ const verifyToken = async (req, res, next)=>{
             //check in token_list
             const check = await TokenList.findOne({mem_id:decoded._id, token: token})
             if(check){
+                req.user = decoded;
                 return next();
             }else{
                 return res.status(403).send({status: false, message: "Unauthorized"})

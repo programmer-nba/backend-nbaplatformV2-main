@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
-const {WalletHistory} = require('../../models/wallet.history.model');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
 
 //STOP 1 - Check
