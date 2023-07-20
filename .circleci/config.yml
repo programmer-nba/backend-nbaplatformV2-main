@@ -12,5 +12,5 @@ version: 2
          - deploy:
       filters:
          branches:
-            only: main
+            only: mian
 
