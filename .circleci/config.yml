@@ -3,7 +3,7 @@ orbs:
   node: circleci/node@1.1.6
 # Define the jobs we want to run for this project
 jobs:
-  push-and-build:
+  pull-and-build:
     executor:
       name: node/default
     steps:
