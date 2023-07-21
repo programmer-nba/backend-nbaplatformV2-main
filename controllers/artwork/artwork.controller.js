@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const CheckUserWallet = require("../../lib/checkwallet");
 const {DebitWallet} = require("../../lib/transection/debit.wallet");
+const Joi = require('joi');
 
 //get Artwork category
 
@@ -65,12 +66,18 @@ module.exports.getProductGraphicByCategoryId = async (req, res) => {
 
 module.exports.CreatePreorder = async (req, res) => {
   try {
-    console.log("user", req.user);
+
+    const {error} = validate_order(req.body);
+
+    if(error) {
+      res.status(403).send({message:"ข้อมูลไม่ถูกต้อง",data:error.details[0].message})
+    }
+
 
     console.log({product: req.body.product_price_id, amount: req.body.amount});
 
     const priceId = req.body.product_price_id;
-    const amount = req.body.amount;
+    const amount = Number(req.body.amount);
 
     if (!mongoose.isValidObjectId(priceId)) {
       return res.status(403).send({message: "Invalid price id"});
@@ -93,12 +100,18 @@ module.exports.CreatePreorder = async (req, res) => {
           const userWallet = await CheckUserWallet(req.user._id);
 
           const price = Number(response.data.data.price);
+          
 
-          if (userWallet < price || userWallet <= 0) {
+          console.log('price',price);
+
+          console.log('userWallet',userWallet);
+          console.log('user',req.user)
+
+          if (userWallet < price*amount || userWallet <= 0) {
             return res.status(403).send({message: "มีเงินไม่เพียงพอ"});
           }
 
-          const total = response.data.data.price * amount;
+          const total = response.data.data.price * Number(amount);
 
           const requestData = {
             shop_id: req.user._id, //id ร้านค้า
@@ -147,7 +160,7 @@ module.exports.CreatePreorder = async (req, res) => {
                   mem_id: req.user._id,
                   name: `service artwork ${result.data.data.invoice}`,
                   type: "ออก",
-                  amount: price,
+                  amount: price*amount,
                   detail: `${JSON.stringify(response.data.data.order_detail)}`,
                   timestamp: `${new Date()}`,
                 };
@@ -177,3 +190,18 @@ module.exports.CreatePreorder = async (req, res) => {
     return res.status(500).send({message: "Internal Server Error"});
   }
 };
+
+
+//validater input 
+const validate_order = (data)=>{
+  const schema = Joi.object({
+    "artwork_type" : Joi.string().required().label('กรุณาระบุ artwork type'),
+    "cus_name" : Joi.string().required().label('กรุณาระบุชื่อลูกค้า'),
+    "cus_tel" : Joi.string().required().label('กรุณาระบุเบอร์โทรลูกค้า'),
+    "cus_address" : Joi.string().required().label('กรุณาระบุที่อยุ่'), //ที่อยู่ลูกค้า
+    "product_price_id":Joi.string().required().label('กรุณาระบุรหัสสินค้า'),
+    "amount":Joi.number().required().label('กรุณาระบุจำนวนการสั่งซื้อเป็นตัวเลข'), //จำนวน เซ็ต
+    "remark" : Joi.string().required().allow('').label('รายละเอียดเพิ่มเติม') //รายละเอียดเพิ่มเติม
+  });
+  return schema.validate(data);
+}

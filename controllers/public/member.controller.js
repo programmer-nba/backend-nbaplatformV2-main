@@ -7,7 +7,6 @@ const dayjs = require("dayjs");
 const {NotifyMember} = require("../../models/member/notify.member.model");
 const { numberDigitFormat } = require("../../lib/format_function");
 
-
 const validate_commission = (data) => {
   const schema = Joi.object({
     name: Joi.string().required().label("ไม่พบชื่อรายการ"),
@@ -26,6 +25,7 @@ const validate_commission = (data) => {
   });
   return schema.validate(data);
 };
+
 exports.getByTel = async (req, res) => {
   try {
     const tel = req.params.tel;
