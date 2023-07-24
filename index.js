@@ -9,6 +9,8 @@ const cors = require("cors");
 mongoose.set('strictQuery',true)
 mongoose.connect(process.env.DB,{ useNewUrlParser: true })
 
+//test index.js
+
 app.use(express.json());
 app.use(cors());
 
