@@ -11,6 +11,7 @@ mongoose.connect(process.env.DB,{ useNewUrlParser: true })
 
 app.use(express.json());
 app.use(cors());
+
 //Member
 app.use('/v2/nba-platform', require("./routes/index"));
 app.use('/v2/nba-platform/member', require("./routes/member"));
