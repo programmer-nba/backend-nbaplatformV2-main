@@ -1,7 +1,22 @@
 const mongoose = require("mongoose");
+const {linenotify} = require("../../lib/line.notify");
 const CheckUserWallet = require("../../lib/checkwallet");
 const {DebitWallet} = require("../../lib/transection/debit.wallet");
 const Joi = require('joi');
+
+//validater input 
+const validate_order = (data)=>{
+  const schema = Joi.object({
+    artwork_type : Joi.string().required().label('กรุณาระบุ artwork type'),
+    cus_name : Joi.string().required().label('กรุณาระบุชื่อลูกค้า'),
+    cus_tel : Joi.string().required().label('กรุณาระบุเบอร์โทรลูกค้า'),
+    cus_address : Joi.string().required().label('กรุณาระบุที่อยุ่'), //ที่อยู่ลูกค้า
+    product_price_id:Joi.string().required().label('กรุณาระบุรหัสสินค้า'),
+    amount:Joi.number().required().label('กรุณาระบุจำนวนการสั่งซื้อเป็นตัวเลข'), //จำนวน เซ็ต
+    remark : Joi.string().required().allow('').label('รายละเอียดเพิ่มเติม') //รายละเอียดเพิ่มเติม
+  });
+  return schema.validate(data);
+}
 
 //get Artwork category
 
@@ -70,7 +85,7 @@ module.exports.CreatePreorder = async (req, res) => {
     const {error} = validate_order(req.body);
 
     if(error) {
-      res.status(403).send({message:"ข้อมูลไม่ถูกต้อง",data:error.details[0].message})
+      return res.status(403).send({message:"ข้อมูลไม่ถูกต้อง",data:error.details[0].message})
     }
 
 
@@ -161,13 +176,19 @@ module.exports.CreatePreorder = async (req, res) => {
                   name: `service artwork ${result.data.data.invoice}`,
                   type: "ออก",
                   amount: price*amount,
-                  detail: `${JSON.stringify(response.data.data.order_detail)}`,
+                  detail: `${JSON.stringify(result.data.data.order_detail)}`,
                   timestamp: `${new Date()}`,
                 };
 
                 const token = req.headers["token"];
 
                 await DebitWallet(token, debitData);
+
+                //line message
+                const message = "ส่งงาน"
+                await linenotify(message);
+
+
                 return res
                   .status(200)
                   .send({message: "ส่ง preorder สำเร็จ", data: result.data});
@@ -192,16 +213,3 @@ module.exports.CreatePreorder = async (req, res) => {
 };
 
 
-//validater input 
-const validate_order = (data)=>{
-  const schema = Joi.object({
-    "artwork_type" : Joi.string().required().label('กรุณาระบุ artwork type'),
-    "cus_name" : Joi.string().required().label('กรุณาระบุชื่อลูกค้า'),
-    "cus_tel" : Joi.string().required().label('กรุณาระบุเบอร์โทรลูกค้า'),
-    "cus_address" : Joi.string().required().label('กรุณาระบุที่อยุ่'), //ที่อยู่ลูกค้า
-    "product_price_id":Joi.string().required().label('กรุณาระบุรหัสสินค้า'),
-    "amount":Joi.number().required().label('กรุณาระบุจำนวนการสั่งซื้อเป็นตัวเลข'), //จำนวน เซ็ต
-    "remark" : Joi.string().required().allow('').label('รายละเอียดเพิ่มเติม') //รายละเอียดเพิ่มเติม
-  });
-  return schema.validate(data);
-}
