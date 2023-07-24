@@ -2,6 +2,33 @@ const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
 
+//STEP 0- get Mobile topup service
+module.exports.GetCardTopup = async (req,res) => {
+    try {
+
+        const axios = require('axios');
+        const config = {
+            method: 'GET',
+            url:`${process.env.SHOP_API}/api/cs/card-topup`,
+            headers:{
+                'auth-token':process.env.SHOP_API_TOKEN
+            }
+        }
+
+        await axios(config).then(result=>{
+            return res.status(200).send({message:"ดึงข้อมูล card topup สำเร็จ",data:result.data});
+        })
+        .catch(error=>{
+            return res.status(403).send({message:"ดึงข้อมูลไม่สำเร็จ",data:error.message});
+        })
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({message:"Internal Server Error"});
+    }
+    
+}
+
 //STOP 1 - Check
 module.exports.Check = async (req,res) => {
     try {
