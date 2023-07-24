@@ -185,7 +185,7 @@ module.exports.CreatePreorder = async (req, res) => {
                 await DebitWallet(token, debitData);
 
                 //line message
-                const message = "ส่งงาน"
+                const message = "ส่งงาน order graphic แล้ว"
                 await linenotify(message);
 
 

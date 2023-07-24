@@ -2,6 +2,11 @@ const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
 
+//STEP 0- get Mobile topup service
+module.exports.GetMobileTopup = async (req,res) => {
+    
+}
+
 //STOP 1 - Check
 module.exports.Check = async (req,res) => {
     try {
