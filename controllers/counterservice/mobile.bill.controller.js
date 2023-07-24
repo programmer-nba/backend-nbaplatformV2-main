@@ -2,6 +2,33 @@ const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
 
+//STEP 0- get Mobile bill service
+module.exports.GetMobileBillService = async (req,res) => {
+    try {
+
+        const axios = require('axios');
+        const config = {
+            method: 'GET',
+            url:`${process.env.SHOP_API}/api/cs/mobile-bill`,
+            headers:{
+                'auth-token':process.env.SHOP_API_TOKEN
+            }
+        }
+
+        await axios(config).then(result=>{
+            return res.status(200).send({message:"ดึงข้อมูล mobile bill service สำเร็จ",data:result.data});
+        })
+        .catch(error=>{
+            return res.status(403).send({message:"ดึงข้อมูลไม่สำเร็จ",data:error.message});
+        })
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({message:"Internal Server Error"});
+    }
+    
+}
+
 //START 1 - check
 module.exports.Check = async (req,res)=>{
     try {
@@ -13,7 +40,8 @@ module.exports.Check = async (req,res)=>{
         const userWallet = await CheckUserWallet(decoded._id);
             console.log(userWallet);
     
-            if(userWallet < req.body.price){
+            const price = Number(req.body.price)
+            if(userWallet < price || userWallet <=0){
                 return res.status(403).send({message:'มีเงินไม่เพียงพอ'});
             }
             
@@ -33,6 +61,9 @@ module.exports.Check = async (req,res)=>{
         await axios(request).then(response => {
                     return res.status(200).send({message:'เช็คข้อมูลสำเร็จ',data:response.data});
                 })
+                .catch(err=>{
+                    return res.status(403).send({message:'เช็คข้อมูลไม่สำเร็จ',data:err})
+                })
         
     } catch (error) {
         console.error(error);
@@ -41,7 +72,7 @@ module.exports.Check = async (req,res)=>{
 }
 
 //STEP 2 - Recieved Transaction
-module.exports.GetTransection = async (req,res) => {
+module.exports.GetTransaction = async (req,res) => {
     try {
     const token = req.headers['token'];
 
@@ -70,7 +101,7 @@ const request = {
     headers:{
         'auth-token':process.env.SHOP_API_TOKEN,
     },
-    url:`${process.env.SHOP_API}/counter_service/mobile_topup/verify`,
+    url:`${process.env.SHOP_API}/counter_service/mobile_bill/verify`,
     data:data
 }
 await axios(request).then(response => {
@@ -100,51 +131,57 @@ module.exports.Confirm = async (req,res) => {
     
         const userWallet = await CheckUserWallet(decoded._id);
             console.log(userWallet);
+
+            const price = Number(req.body.price);
     
-            if(userWallet < req.body.price){
+            if(userWallet < price){
                 return res.status(403).send({message:'มีเงินไม่เพียงพอ'});
             }else{
-                console.log(`${decoded._id} ต้องการทำรายการเติมเงินมือถือ`)
+                console.log(`${decoded._id} ต้องการทำราย mobile bill`)
             }
 
 
         const requestdata = {
 
-            shop_id: decoded._id,
-            payment_type : "wallet",
-            type : "เติมเงินมือถือ",
+            shop_id : req.user._id,
             mobile : req.body.mobile,
-            price : req.body.price,
-            charge : req.body.charge,
-            receive : (req.body.price + req.body.charge + req.body.profit_nba + req.body.profit_shop),
-            transid: req.body.transid,
-            profit_nba: (req.body.profit_nba + req.body.profit_shop),
-            profit_shop: 0,
-            cost: req.body.cost,
+            detail : "",
+            company : "NBA Platform",
+            payment_type : "wallet",
+            price : price,
+            charge : 15,
+            receive : price + 15,
+            cost_nba : 15,
+            cost_shop : 0,
             employee : "Platform-member",
-            timestamp : `${new Date()}`
+            transid : req.body.transid,
+            timestamp : new Date(),
+            updated_by: "",
+            created_by: "NBA-Platform"
  
         }
 
         console.log(requestdata);
     
     var axios = require('axios');
+
     const request = {
         method:'post',
         headers:{
             'auth-token':process.env.SHOP_API_TOKEN,
             'Content-Type': 'application/json'
         },
-        url:`${process.env.SHOP_API}/counter_service/mobile_topup/confirm`,
+        url:`${process.env.SHOP_API}/counter_service/mobile_bill/confirm`,
         data:requestdata
     }
+
     await axios(request).then(async response => {
         //create wallet history
-        let percent =3;
-        if(response.data.data.productid ==="p00003" || response.data.data.productid === "p00016"){
-            percent = 2;
-        }
-        const debitAmount = response.data.data.price - (response.data.data.price*(percent - 0.5)/100)
+
+        console.log(response.data);
+        const charge = 15;
+       
+        const debitAmount = Number(response.data.data.price) + charge
    
         const debitData = {
             mem_id:decoded._id,
