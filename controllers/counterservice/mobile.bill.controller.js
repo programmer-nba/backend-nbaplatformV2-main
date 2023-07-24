@@ -193,11 +193,22 @@ module.exports.Confirm = async (req,res) => {
 
         }
 
-      await DebitWallet(token,debitData).then(result=>{
-        console.log('debite wallet result: ',result);
-      })
+      await DebitWallet(token,debitData);
+      
+      const DataResponse = {
+        status:response.data.status,
+        data:{
+            serviceid:response.data.data.detail.productid,
+            service_name:response.data.data.detail.productname,
+            price:response.data.data.price,
+            charge:response.data.data.charge,
+            total:(Number(response.data.data.price)+Number(response.data.data.charge)),
+            remainding_wallet:userWallet-(Number(response.data.data.price)+Number(response.data.data.charge))
+        }
+
+      }
        
-        return res.status(200).send(response.data);
+        return res.status(200).send(DataResponse);
     })
     .catch(error=>{
         console.error(error);
