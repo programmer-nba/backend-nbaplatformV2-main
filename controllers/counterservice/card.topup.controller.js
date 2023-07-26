@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
+const { TempTrans } = require('../../models/temporaryTrans.model')
 
 //STEP 0- get Mobile topup service
 module.exports.GetCardTopup = async (req,res) => {
@@ -66,14 +67,26 @@ const request = {
 }
 
 
-await axios(request).then(response => {
+await axios(request).then(async (response) => {
+
+    //create tempolary transection
+    const data = {
+        transid: response.data.transid,
+        price: Number(req.body.price),
+        mobile: req.body.mobile
+    }
+     const tempTrans = new TempTrans(data);
+     await tempTrans.save(err=>{
+        console.log(err);
+     })
+
     return res.status(200).send(response.data);
 })
 .catch(error=>{
     return res.status(403).send(error.message);
 });
 
-} catch (error) {
+} catch (error) { 
     console.error(error);
     return res.status(500).send({message:'มีบางอย่างผิดพลาด'});
         
@@ -83,17 +96,22 @@ await axios(request).then(response => {
 
 //STEP 2 - Confirm
 module.exports.Confirm = async (req,res) => {
+ 
     try {
+        const Transid = req.body.transid
 
-           // check user money
-           const token = req.headers['token'];
+        const TempTransData = await TempTrans.findOne({ transid : Transid });
 
-           const decoded = jwt.verify(token,process.env.TOKEN_KEY);
-       
-           const userWallet = await CheckUserWallet(decoded._id);
-               console.log(userWallet);
-
-               const price = Number(req.body.price);
+        
+        // check user money
+        const token = req.headers['token'];
+        
+        const decoded = jwt.verify(token,process.env.TOKEN_KEY);
+        
+        const userWallet = await CheckUserWallet(decoded._id);
+        console.log(userWallet);
+        
+        const price = TempTransData.price;
        
                if(userWallet < price){
                    return res.status(403).send({message:'มีเงินไม่เพียงพอ'});
@@ -104,11 +122,13 @@ module.exports.Confirm = async (req,res) => {
         const cost = price - (price*2/100);
         const profit_nba = price*1/100;
         const profit_shop = 0;
+
         const requestdata = {
+
         shop_id : decoded._id,
         payment_type : 'wallet',
         type: "บัตรเติมเงิน",
-        mobile : req.body.mobile,
+        mobile : TempTransData.mobile,
         price : price,
         charge: 0,
         receive : cost,
@@ -116,7 +136,7 @@ module.exports.Confirm = async (req,res) => {
         profit_shop : profit_shop,
         cost : cost,
         employee : 'Platform-member',
-        transid : req.body.transid,
+        transid : TempTransData.transid,
         timestamp: `${new Date()}`
  
  
@@ -135,6 +155,8 @@ module.exports.Confirm = async (req,res) => {
     }
     await axios(request).then(async (response) => {
 
+console.log(response)
+
         if(response.data.data.detail.error_code !=='E00'){
             return res.status(403).send({code:response.data.data.detail.error_code,data:response.data.data.detail});
         }else{
@@ -152,7 +174,6 @@ module.exports.Confirm = async (req,res) => {
             }
     
           await DebitWallet(token,debitData);
-          
 
           //get user remainding wallet;
 
