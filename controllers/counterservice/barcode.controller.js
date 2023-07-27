@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
-
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
+const { BarcodeCheck } = require('../../models/barcodeCheck.model')
+const { TempTrans } = require('../../models/temporaryTrans.model')
 
 //STEP 0- get Barcode service
 module.exports.GetBarcodeService = async (req,res) => {
@@ -32,12 +33,15 @@ module.exports.GetBarcodeService = async (req,res) => {
 
 //STEP 1 - Check
 module.exports.Check = async (req,res) => {
+    console.log('check')
     try {
         const axios = require('axios');
         const requestdata = {
             mobile:req.body.mobile,
             barcode:req.body.barcode
         }
+
+        console.log(requestdata)
         const request = {
             method:'post',
             headers:{
@@ -48,11 +52,40 @@ module.exports.Check = async (req,res) => {
             data:requestdata
         }
 
-        await axios(request).then(response => {
+        await axios(request).then(async (response) => {
+            
+            //check barcode status
+            console.log('data',response.data)
+            const barcodeData = await BarcodeCheck.findOne({ barcode: req.body.barcode });
+            if (barcodeData && barcodeData.status === 'barcode ไม่สามารถใช้งานได้') {
+                return res.status(400).send({ message: 'Barcode ไม่สามารถใช้งานได้' });
+            }
+
+            //create barcode data collector
+            const data = {
+                productid: response.data.productid,
+                barcode: req.body.barcode,
+                mobile: req.body.mobile,
+                price: Number(response.data.amount),
+                data1: response.data.data_value[0],
+                data2: response.data.data_value[1],
+                data3: response.data.data_value[2],
+                data4: response.data.data_value[3],
+                data5: response.data.data_value[4]
+            }
+            console.log(data)
+            const barcodeCheck = new BarcodeCheck(data);
+            barcodeCheck.save(err=>{
+                if (err) {
+                console.log(err);
+                }
+            })
+
             return res.status(200).send(response.data);
         })
         .catch(error => {
-            return res.status(400).send(error.message);
+            console.error(error);
+            return res.status(400).send({message:error.message,data:'ไม่สามารถชำระได้'});
         })
         
     } catch (error) {
@@ -65,6 +98,10 @@ module.exports.Check = async (req,res) => {
 module.exports.Verify = async (req,res) => {
     try {
 
+        const data5 = req.body.data5
+
+        const barcodeData = await BarcodeCheck.findOne({ data5 : data5 });
+
         const token = req.headers['token'];
         const decoded = jwt.verify(token, process.env.TOKEN_KEY);
 
@@ -76,14 +113,14 @@ module.exports.Verify = async (req,res) => {
 
         const axios = require('axios');
         const requestdata = {
-            productid : req.body.productid,
+            productid : barcodeData.productid,
             mobile : req.body.mobile,
-            price : req.body.price,
-            data1 :req.body.data1,
-            data2 :req.body.data2,
-            data3 :req.body.data3,
-            data4 :req.body.data4,
-            data5 :req.body.data5
+            price : barcodeData.price,
+            data1 : barcodeData.data1, 
+            data2 : barcodeData.data2,
+            data3 : barcodeData.data3,
+            data4 : barcodeData.data4,
+            data5 : req.body.data5
         }
         const request = {
             method:'post',
@@ -95,9 +132,23 @@ module.exports.Verify = async (req,res) => {
             data:requestdata
         }
 
-        await axios(request).then(response => {
+        await axios(request).then(async response => {
 
-            const price = Number(req.body.price);
+            //create tempolary transection
+            const data = {
+                transid: response.data.transid,
+                price: barcodeData.price,
+                mobile: req.body.mobile
+            }
+            const tempTrans = new TempTrans(data);
+            await tempTrans.save(err=>{
+                console.log(err);
+            })
+
+            barcodeData.transid = response.data.transid
+            await barcodeData.save();
+
+            const price = barcodeData.price
 
             if(userWallet < price){
                 return res.status(403).send({message:"มีเงินไม่เพียงพอ"})
@@ -118,12 +169,16 @@ module.exports.Verify = async (req,res) => {
 module.exports.Confirm = async (req,res) => {
     try {
 
+        const Transid = req.body.transid
+
+        const TempTransData = await TempTrans.findOne({ transid : Transid });
+
         const token = req.headers['token'];
         const decoded = jwt.verify(token, process.env.TOKEN_KEY);
 
         const userWallet = await CheckUserWallet(decoded._id);
 
-        const price = Number(req.body.price);
+        const price = TempTransData.price
 
         if(userWallet < price){
             return res.status(403).send({message:"มีเงินไม่เพียงพอ"})
@@ -131,18 +186,18 @@ module.exports.Confirm = async (req,res) => {
 
         const axios = require('axios');
 
-        const debitValue = price + req.body.charge
+        const debitValue = price + 15
         const requestdata = {
             
                 shop_id : decoded._id,
-                mobile : req.body.mobile,
-                price : req.body.price,
-                charge: req.body.charge,
-                receive:debitValue,
+                mobile : TempTransData.mobile,
+                price : TempTransData.price,
+                charge: 15,
+                receive: debitValue,
                 payment_type : 'wallet',
-                transid: req.body.transid,
-                cost_nba: req.body.cost_nba,
-                cost_shop: req.body.cost_shop,
+                transid: TempTransData.transid,
+                cost_nba: 0,
+                cost_shop: 0,
                 employee : 'Platform-member',
                 status : [
                     {
@@ -165,6 +220,14 @@ module.exports.Confirm = async (req,res) => {
 
         await axios(request).then(async (response) => {
 
+            const barcodeData = await BarcodeCheck.findOne({ transid: TempTransData.transid });
+            if (barcodeData) {
+            barcodeData.status = 'barcode ไม่สามารถใช้งานได้';
+            await barcodeData.save();
+            } else {
+            console.log("ไม่สามาถค้นหา:", TempTransData.transid);
+            }
+            
             if(response){
 
                 console.log(response.data.data)
@@ -184,6 +247,12 @@ module.exports.Confirm = async (req,res) => {
                 }
                 
                 await DebitWallet(token,debitData)
+
+                //delete temporary transection
+                const TempTransData = await TempTrans.findOneAndDelete({ transid: Transid })
+                if (TempTransData) {
+                    res.status(200)
+                }
                 
                 return res.status(200).send({
                     status:true,
@@ -198,8 +267,7 @@ module.exports.Confirm = async (req,res) => {
                     }
                 });
             }
-        })
-        .catch(error => {
+        }).catch(error => {
             return res.status(400).send(error.message);
         })
 

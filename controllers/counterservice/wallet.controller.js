@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
+const { TempTrans } = require('../../models/temporaryTrans.model')
 
 //STEP 0- get wallet service
 module.exports.GetWalletService= async (req,res) => {
@@ -63,7 +64,19 @@ const request = {
     url:`${process.env.SHOP_API}/counter_service/wallet/verify`,
     data:data
 }
-await axios(request).then(response => {
+await axios(request).then(async response => {
+
+//create tempolary transection
+const data = {
+    transid: response.data.transid,
+    price: Number(req.body.price),
+    mobile: req.body.mobile
+}
+ const tempTrans = new TempTrans(data);
+ await tempTrans.save(err=>{
+    console.log(err);
+ })
+
     return res.status(200).send(response.data);
 })
 .catch(error=>{
@@ -83,12 +96,16 @@ await axios(request).then(response => {
 module.exports.Confirm = async (req,res) => {
     try {
 
+        const Transid = req.body.transid
+
+        const TempTransData = await TempTrans.findOne({ transid : Transid });
+
            // check user money
            const token = req.headers['token'];
 
            const decoded = jwt.verify(token,process.env.TOKEN_KEY);
 
-           const price = Number(req.body.price);
+           const price = TempTransData.price
        
            const userWallet = await CheckUserWallet(decoded._id);
                console.log(userWallet);
@@ -115,7 +132,7 @@ module.exports.Confirm = async (req,res) => {
         shop_id : decoded._id,
         payment_type : 'wallet',
         type: "เติม wallet",
-        mobile : req.body.mobile,
+        mobile : TempTransData.mobile,
         price : price,
         charge: 0,
         receive : net_price,
@@ -123,7 +140,7 @@ module.exports.Confirm = async (req,res) => {
         profit_shop : profit_shop,
         cost : cost,
         employee : 'Platform-member',
-        transid : req.body.transid,
+        transid : TempTransData.transid,
         timestamp: `${new Date()}`
  
  
@@ -157,12 +174,16 @@ module.exports.Confirm = async (req,res) => {
                 timestamp: `${new Date()}`
     
             }
-    
-          await DebitWallet(token,debitData);
+
+            //get user remainding wallet;
+            const RemaindingWallet = await DebitWallet(token,debitData);
           
-
-          //get user remainding wallet;
-
+            //delete temporary transection
+            const TempTransData = await TempTrans.findOneAndDelete({ transid: Transid })
+            if (TempTransData) {
+                res.status(200)
+            }
+          
             return res.status(200).send({
                 status:true,
                 data:{
@@ -171,7 +192,7 @@ module.exports.Confirm = async (req,res) => {
                     price:response.data.data.detail.price,
                     charge:charge,
                     debit:net_price,
-                    remainding_wallet:(userWallet - response.data.data.cost) 
+                    remainding_wallet:RemaindingWallet,
                 }});
         }
     })

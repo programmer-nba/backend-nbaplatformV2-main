@@ -98,11 +98,11 @@ await axios(request).then(async (response) => {
 module.exports.Confirm = async (req,res) => {
  
     try {
+
         const Transid = req.body.transid
 
         const TempTransData = await TempTrans.findOne({ transid : Transid });
 
-        
         // check user money
         const token = req.headers['token'];
         
@@ -172,10 +172,15 @@ console.log(response)
                 timestamp: `${new Date()}`
     
             }
-    
-          await DebitWallet(token,debitData);
 
-          //get user remainding wallet;
+            //get user remainding wallet;
+            const RemaindingWallet = await DebitWallet(token,debitData);
+
+            //delete temporary transection
+            const TempTransData = await TempTrans.findOneAndDelete({ transid: Transid })
+                if (TempTransData) {
+                    res.status(200)
+                }
 
             return res.status(200).send({
                 status:true,
@@ -185,7 +190,7 @@ console.log(response)
                     price:response.data.data.detail.price,
                     discount:response.data.data.price*2/100,
                     debit:response.data.data.cost,
-                    remainding_wallet:(userWallet - response.data.data.cost) 
+                    remainding_wallet: RemaindingWallet,
                 }});
         }
     })
