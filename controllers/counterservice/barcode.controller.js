@@ -220,9 +220,8 @@ module.exports.Confirm = async (req,res) => {
 
         await axios(request).then(async (response) => {
 
-            if (process.env.SERVICE === "development") {
-                return res.status(200)
-            } else {
+            if (process.env.SERVICE === "production") {
+                
                 const barcodeData = await BarcodeCheck.findOne({ transid: TempTransData.transid });
                 if (barcodeData) {
                 barcodeData.status = 'barcode ไม่สามารถใช้งานได้';
@@ -231,7 +230,7 @@ module.exports.Confirm = async (req,res) => {
                 console.log("ไม่สามาถค้นหา:", TempTransData.transid);
                 }
             }
-            
+
             if(response){
 
                 console.log(response.data.data)
