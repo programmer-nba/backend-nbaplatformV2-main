@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const CheckUserWallet = require('../../lib/checkwallet');
 const { DebitWallet} = require('../../lib/transection/debit.wallet');
+const { TempTrans } = require('../../models/temporaryTrans.model')
 
 //STEP 0- get Mobile bill service
 module.exports.GetMobileBillService = async (req,res) => {
@@ -59,6 +60,7 @@ module.exports.Check = async (req,res)=>{
             data:dataRequest
         } 
         await axios(request).then(response => {
+
                     return res.status(200).send({message:'เช็คข้อมูลสำเร็จ',data:response.data});
                 })
                 .catch(err=>{
@@ -104,7 +106,19 @@ const request = {
     url:`${process.env.SHOP_API}/counter_service/mobile_bill/verify`,
     data:data
 }
-await axios(request).then(response => {
+await axios(request).then(async response => {
+
+    //create tempolary transection
+    const data = {
+        transid: response.data.transid,
+        price: Number(req.body.price),
+        mobile: req.body.mobile
+    }
+    const tempTrans = new TempTrans(data);
+    await tempTrans.save(err=>{
+        console.log(err);
+    })
+
     return res.status(200).send(response.data);
 })
 .catch(error=>{
@@ -124,6 +138,10 @@ await axios(request).then(response => {
 module.exports.Confirm = async (req,res) => {
     try {
 
+        const Transid = req.body.transid
+
+        const TempTransData = await TempTrans.findOne({ transid : Transid });
+
         // check user money
         const token = req.headers['token'];
 
@@ -132,7 +150,7 @@ module.exports.Confirm = async (req,res) => {
         const userWallet = await CheckUserWallet(decoded._id);
             console.log(userWallet);
 
-            const price = Number(req.body.price);
+            const price = TempTransData.price
     
             if(userWallet < price){
                 return res.status(403).send({message:'มีเงินไม่เพียงพอ'});
@@ -144,7 +162,7 @@ module.exports.Confirm = async (req,res) => {
         const requestdata = {
 
             shop_id : req.user._id,
-            mobile : req.body.mobile,
+            mobile : TempTransData.mobile,
             detail : "",
             company : "NBA Platform",
             payment_type : "wallet",
@@ -154,7 +172,7 @@ module.exports.Confirm = async (req,res) => {
             cost_nba : 15,
             cost_shop : 0,
             employee : "Platform-member",
-            transid : req.body.transid,
+            transid : TempTransData.transid,
             timestamp : new Date(),
             updated_by: "",
             created_by: "NBA-Platform"
@@ -193,7 +211,13 @@ module.exports.Confirm = async (req,res) => {
 
         }
 
-      await DebitWallet(token,debitData);
+      const RemaindingWallet = await DebitWallet(token,debitData);
+
+      //delete temporary transection
+      const TempTransData = await TempTrans.findOneAndDelete({ transid: Transid })
+      if (TempTransData) {
+          res.status(200)
+      }
       
       const DataResponse = {
         status:response.data.status,
@@ -203,7 +227,7 @@ module.exports.Confirm = async (req,res) => {
             price:response.data.data.price,
             charge:response.data.data.charge,
             total:(Number(response.data.data.price)+Number(response.data.data.charge)),
-            remainding_wallet:userWallet-(Number(response.data.data.price)+Number(response.data.data.charge))
+            remainding_wallet:RemaindingWallet,
         }
 
       }

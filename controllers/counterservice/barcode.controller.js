@@ -85,7 +85,7 @@ module.exports.Check = async (req,res) => {
         })
         .catch(error => {
             console.error(error);
-            return res.status(400).send({message:error.message,data:'ไม่สามารถชำระได้'});
+            return res.status(400).send({message:error,data:'ไม่สามารถชำระได้', });
         })
         
     } catch (error) {
