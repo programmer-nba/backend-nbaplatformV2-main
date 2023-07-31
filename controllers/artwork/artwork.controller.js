@@ -176,7 +176,7 @@ module.exports.CreatePreorder = async (req, res) => {
                   name: `service artwork ${result.data.data.invoice}`,
                   type: "ออก",
                   amount: price*amount,
-                  detail: `${JSON.stringify(result.data.data.order_detail)}`,
+                  detail: result.data.data.order_detail,
                   timestamp: `${new Date()}`,
                 };
 

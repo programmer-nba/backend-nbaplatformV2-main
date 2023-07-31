@@ -173,7 +173,7 @@ module.exports.Confirm = async (req,res) => {
             name:`service mobile topup ${response.data.data.invoice}`,
             type:"ออก",
             amount:debitAmount,
-            detail:`${JSON.stringify(response.data.data.detail)}`,
+            detail: response.data.data.detail,
             timestamp: `${new Date()}`
 
         }

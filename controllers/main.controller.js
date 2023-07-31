@@ -102,6 +102,7 @@ exports.login = async(req, res)=>{
         const member = await Member.findOne({tel});
         if(member && (await bcrypt.compare(password, member.password))){
             console.log('เข้าสู่ระบบสำเร็จ');
+            
             const payload = {
                 _id:member._id,
                  auth: 'member',

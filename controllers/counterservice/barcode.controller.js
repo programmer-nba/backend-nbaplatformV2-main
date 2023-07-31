@@ -85,7 +85,7 @@ module.exports.Check = async (req,res) => {
         })
         .catch(error => {
             console.error(error);
-            return res.status(400).send({message:error,data:'ไม่สามารถชำระได้', });
+            return res.status(400).send({message:error.message,data:'ไม่สามารถชำระได้'});
         })
         
     } catch (error) {
@@ -107,9 +107,9 @@ module.exports.Verify = async (req,res) => {
 
         const userWallet = await CheckUserWallet(decoded._id);
 
-        // if(userWallet < req.body.price){
-        //     return res.status(403).send({message:"มีเงินไม่เพียงพอ"})
-        // }
+        if(userWallet < req.body.price){
+            return res.status(403).send({message:"มีเงินไม่เพียงพอ"})
+        }
 
         const axios = require('axios');
         const requestdata = {
@@ -140,8 +140,9 @@ module.exports.Verify = async (req,res) => {
                 price: barcodeData.price,
                 mobile: req.body.mobile
             }
+
             const tempTrans = new TempTrans(data);
-            await tempTrans.save(err=>{
+                  tempTrans.save(err=>{
                 console.log(err);
             })
 
@@ -158,6 +159,7 @@ module.exports.Verify = async (req,res) => {
             }
         })
         .catch(error => {
+            console.error(error)
             return res.status(400).send(error.message);
         })
     } catch (error) {
@@ -243,8 +245,8 @@ module.exports.Confirm = async (req,res) => {
                     mem_id:decoded._id,
                     name:`service barcode ${response.data.data.invoice}`,
                     type:"ออก",
-                    amount:debitAmount,
-                    detail:`${JSON.stringify(response.data.data)}`,
+                    amount: debitAmount,
+                    detail: response.data.data,
                     timestamp: `${new Date()}`
         
                 }

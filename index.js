@@ -30,6 +30,9 @@ app.use('/v2/nba-platform/notify', require('./routes/notify'));
 //ประวัติค่าคอมมิชชั่น Money History
 app.use('/v2/nba-platform/money/history', require('./routes/money.history'));
 
+//ปวะวัติ wallet
+app.use('/v2/nba-platform/wallet/history', require('./routes/wallet.history'));
+
 //Admin
 app.use('/v2/nba-platform/admin', require('./routes/admin/index'));
 app.use('/v2/nba-platform/admin/user', require('./routes/admin/user'));

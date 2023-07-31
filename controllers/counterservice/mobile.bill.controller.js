@@ -205,8 +205,8 @@ module.exports.Confirm = async (req,res) => {
             mem_id:decoded._id,
             name:`service mobile topup ${response.data.invoice}`,
             type:"ออก",
-            amount:debitAmount,
-            detail:`${JSON.stringify(response.data.data.detail)}`,
+            amount: debitAmount,
+            detail: response.data.data.detail,
             timestamp: `${new Date()}`
 
         }
