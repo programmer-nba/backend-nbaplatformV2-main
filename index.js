@@ -54,6 +54,9 @@ app.use('/v2/nba-platform/counter_service/barcode_service',require('./routes/cou
 app.use('/v2/nba-platform/counter_service/nba_service',require('./routes/counterservice/nba'));
 app.use('/v2/nba-platform/counter_service/wallet',require('./routes/counterservice/wallet'));
 
+//facebook service
+app.use('/v2/nba-platform/nbaservice', require('./routes/NBAservice/index'))
+
 //artwork
 app.use('/v2/nba-platform/artwork',require('./routes/artwork/artwork'));
 
