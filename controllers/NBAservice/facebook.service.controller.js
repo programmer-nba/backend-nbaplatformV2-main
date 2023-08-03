@@ -22,10 +22,10 @@ module.exports.GetService = async (req, res) => {
 module.exports.order = async (req, res) => {
     try {
         const axios = require('axios');
-let data = JSON.stringify({
-  "packageid": req.body.packageid,
-  "quantity": req.body.quantity
-});
+let data = {
+  packageid: req.body.packageid,
+  quantity: req.body.quantity
+};
 
 let config = {
   method: 'post',

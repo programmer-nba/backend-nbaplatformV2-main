@@ -6,19 +6,19 @@ const actservice = require('../../controllers/NBAservice/act.service.controller'
 const auth  = require('../../middleware/auth')
 
 //facebookservice
-router.use("/facebookservice/list", auth, facebookservice.GetService)
-router.use("/facebookservice/order", auth, facebookservice.order)
+router.get("/facebookservice/list", auth, facebookservice.GetService)
+router.post("/facebookservice/order", auth, facebookservice.order)
 
 //websiteservice
-router.use("/websiteservice/list", auth, websiteservice.GetService)
+router.get("/websiteservice/list", auth, websiteservice.GetService)
 
 //accountservice
-router.use("/accountservice/list", auth, accountservice.GetService)
-router.use("/accountservice/package/listbycate/:id", auth, accountservice.GetServiceByCateId)
+router.get("/accountservice/list", auth, accountservice.GetService)
+router.get("/accountservice/package/listbycate/:id", auth, accountservice.GetServiceByCateId)
 
 //actlegalservice
-router.use("/actlegalservice/list", auth, actservice.GetService)
-router.use("/actlegalservice/package/listbycate/:id", auth, actservice.GetServiceByCateId)
+router.get("/actlegalservice/list", auth, actservice.GetService)
+router.get("/actlegalservice/package/listbycate/:id", auth, actservice.GetServiceByCateId)
 
 
 module.exports = router
