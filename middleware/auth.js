@@ -15,13 +15,13 @@ const verifyToken = async (req, res, next)=>{
                 req.user = decoded;
                 return next();
             }else{
-                return res.status(403).send({status: false, message: "Unauthorized"})
+                return res.status(403).send({status: false, message: "No session"})
             }
         }else{
-            return res.status(403).send({status: false, message: "Unauthorized"})
+            return res.status(403).send({status: false, message: "No permission"})
         }
     }catch(err){
-        return res.status(401).send({status: false, message: "Unauthorized"})
+        return res.status(401).send({status: false, message: "Internal server error"})
     }
 }
 

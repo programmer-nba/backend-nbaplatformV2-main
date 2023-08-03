@@ -40,3 +40,7 @@ module.exports.GetServiceByCateId = async (req, res) => {
         return res.status(403).send({code:error.code,data:error.message});
     };
 }
+
+module.exports.order = async (req, res) => {
+    
+}
