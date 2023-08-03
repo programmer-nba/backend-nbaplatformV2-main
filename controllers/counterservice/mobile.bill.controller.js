@@ -107,19 +107,33 @@ const request = {
     data:data
 }
 await axios(request).then(async response => {
+    console.log(response.data)
 
     //create tempolary transection
     const data = {
         transid: response.data.transid,
         price: Number(req.body.price),
-        mobile: req.body.mobile
+        mobile: req.body.mobile,
+        charge: response.data.charge,
+        cost_nba: response.data.cost_nba,
+        cost_shop: response.data.cost_shop
     }
     const tempTrans = new TempTrans(data);
     await tempTrans.save(err=>{
         console.log(err);
     })
-
-    return res.status(200).send(response.data);
+    const DataResponse = {
+        status: response.data.status,
+    error_code: response.data.error_code,
+    error_text: response.data.error_text,
+    productid: response.data.productid,
+    charge: response.data.charge,
+    transid: response.data.transid,
+    cost_nba : response.data.cost_nba,
+    cost_shop : response.data.cost_shop,
+    price: response.data.price
+    }
+    return res.status(200).send(DataResponse);
 })
 .catch(error=>{
     return res.status(403).send(error.message);
@@ -167,10 +181,10 @@ module.exports.Confirm = async (req,res) => {
             company : "NBA Platform",
             payment_type : "wallet",
             price : price,
-            charge : 15,
-            receive : price + 15,
-            cost_nba : 15,
-            cost_shop : 0,
+            charge : TempTransData.charge,
+            receive : price + TempTransData.charge,
+            cost_nba : TempTransData.cost_nba,
+            cost_shop : TempTransData.cost_shop,
             employee : "Platform-member",
             transid : TempTransData.transid,
             timestamp : new Date(),
