@@ -27,6 +27,7 @@ module.exports.GetAll = async (req, res) => {
 module.exports.GetById = async (req, res) => {
 
     const token = req.headers["token"];
+    console.log(req.user)
 
     if (!token) {
         return res.status(401).send({
@@ -49,7 +50,6 @@ module.exports.GetById = async (req, res) => {
         }
 
         const wallethistorydata = await WalletHistory.find({ mem_id:member._id });
-        console.log(wallethistorydata)
 
         if (!wallethistorydata) {
             return res.status(404).send({

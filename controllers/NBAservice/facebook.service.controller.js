@@ -1,3 +1,7 @@
+const { Member } = require("../../models/member.model");
+const jwt = require('jsonwebtoken')
+const axios = require('axios');
+
 module.exports.GetService = async (req, res) => {
     try {
         var axios = require('axios');
@@ -21,34 +25,60 @@ module.exports.GetService = async (req, res) => {
 
 module.exports.order = async (req, res) => {
     try {
-        const axios = require('axios');
-let data = {
-  packageid: req.body.packageid,
-  quantity: req.body.quantity
-};
+        const id = req.body.packageid;
+        let data = {
+            packageid: req.body.packageid,
+            quantity: req.body.quantity
+        };
 
-let config = {
-  method: 'post',
-  maxBodyLength: Infinity,
-  url: `${process.env.SHOP_API}/facebookservice/order`,
-  headers: { 
-    'auth-token':process.env.SHOP_API_TOKEN,
-    'Content-Type': 'application/json'
-  },
-  data : data
-};
+        const packageRequestData = {
+            headers: {
+                'auth-token': process.env.SHOP_API_TOKEN,
+                'Content-Type': 'application/json'
+            },
+            url: `${process.env.SHOP_API}/facebookservice/list/${id}`,
+        };
+        const packageResponse = await axios(packageRequestData);
+        console.log(packageResponse.data);
+        if (packageResponse) {
+            // Check user wallet
+            const token = req.headers['token'];
+            try {
+                const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+                const user = await Member.findById(decoded._id);
+                const price = packageResponse.data.data.price * Number(req.body.quantity)
+                if (price && user.wallet < price) {
+                    return res.status(403).send({ message: 'ยอดเงินในกระเป๋าไม่เพียงพอ' })
+                } else {
+                    const newwallet = user.wallet - price
+                    await Member.findByIdAndUpdate(user._id, { wallet: newwallet })
+                }
+            } catch (err) {
+                return res.status(403).send({ message: err });
+            }
+        } else {
+            return res.status(403).send({ message: 'บางอย่างผิดพลาด' })
+        }
 
-await axios.request(config)
-.then((response) => {
-  return res.status(200).send(response.data)
-}) 
-.catch((error) => {
-  console.log(error);
-  return res.status(403).send(error)
-});
+        const orderRequestConfig = {
+            headers: {
+                'auth-token': 'Bearer ' + process.env.SHOP_API_TOKEN,
+                'Content-Type': 'application/json'
+            },
+            url: `${process.env.SHOP_API}/facebookservice/order`,
+            data: data
+        };
+        const orderResponse = await axios.post(orderRequestConfig.url, data, {
+            headers: {
+                'auth-token': 'Bearer ' + process.env.SHOP_API_TOKEN,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log(orderResponse.data);
 
+        return res.status(200).send(orderResponse.data);
     } catch (error) {
         console.error(error);
-        return res.status(403).send({code:error.code,data:error.message});
-    };
-}
+        return res.status(403).send({ code: error.code, data: error.message });
+    }
+};
