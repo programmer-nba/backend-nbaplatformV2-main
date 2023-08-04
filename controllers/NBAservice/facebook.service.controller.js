@@ -27,10 +27,14 @@ module.exports.order = async (req, res) => {
     try {
         const id = req.body.packageid;
         let data = {
+            customer_name: req.body.customer_name,
+            customer_tel: req.body.customer_tel,
+            customer_address: req.body.customer_address,
+            shopid: req.user._id,
             packageid: req.body.packageid,
             quantity: req.body.quantity
         };
-
+        console.log('useruseruser', data)
         const packageRequestData = {
             headers: {
                 'auth-token': process.env.SHOP_API_TOKEN,
