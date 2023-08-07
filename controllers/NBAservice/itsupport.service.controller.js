@@ -69,7 +69,7 @@ module.exports.order = async (req, res) => {
                 'auth-token': 'Bearer ' + process.env.SHOP_API_TOKEN,
                 'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/facebookservice/order`,
+            url: `${process.env.SHOP_API}/itsupportservice/order`,
             data: data
         };
         const orderResponse = await axios.post(orderRequestConfig.url, data, {
