@@ -3,6 +3,7 @@ const facebookservice = require('../../controllers/NBAservice/facebook.service.c
 const websiteservice = require('../../controllers/NBAservice/website.service.controller')
 const accountservice = require('../../controllers/NBAservice/account.service.controller')
 const actservice = require('../../controllers/NBAservice/act.service.controller')
+const itsupportservice = require('../../controllers/NBAservice/itsupport.service.controller')
 const auth  = require('../../middleware/auth')
 
 //facebookservice
@@ -22,6 +23,10 @@ router.post("/accountservice/order", auth, accountservice.order)
 router.get("/actlegalservice/list", auth, actservice.GetService)
 router.get("/actlegalservice/package/listbycate/:id", auth, actservice.GetServiceByCateId)
 router.post("/actlegalservice/order", auth, actservice.order)
+
+//itsupportservice
+router.get("/itsupportservice/list", auth, itsupportservice.GetService)
+router.post("/itsupportservice/order", auth, itsupportservice.order)
 
 
 module.exports = router
