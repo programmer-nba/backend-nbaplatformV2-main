@@ -4,14 +4,36 @@ const axios = require('axios');
 
 module.exports.GetService = async (req, res) => {
     try {
-        const axios = require('axios');
+        var axios = require('axios');
         const request = {
             method: 'get',
             headers: {
                 'auth-token': process.env.SHOP_API_TOKEN,
                 'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/websiteservice/list`,
+            url: `${process.env.SHOP_API}/insuranceservice/category/list`,
+        }
+        await axios(request).then(async (response) => {
+            console.log(response)
+            return res.status(200).send(response.data)
+        })
+    } catch (error) {
+        console.error(error);
+        return res.status(403).send({ code: error.code, data: error.message });
+    };
+}
+
+module.exports.GetServiceByCateId = async (req, res) => {
+    const id = req.params.id
+    try {
+        var axios = require('axios');
+        const request = {
+            method: 'get',
+            headers: {
+                'auth-token': process.env.SHOP_API_TOKEN,
+                'Content-Type': 'application/json'
+            },
+            url: `${process.env.SHOP_API}/insuranceservice/package/listbycate/${id}`,
         }
         await axios(request).then(async (response) => {
             console.log(response)
@@ -33,7 +55,7 @@ module.exports.order = async (req, res) => {
                 'auth-token': process.env.SHOP_API_TOKEN,
                 'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/websiteservice/list/${id}`,
+            url: `${process.env.SHOP_API}/insuranceservice/package/list/${id}`,
         };
         const packageResponse = await axios(packageRequestData);
         console.log(packageResponse.data);
@@ -69,7 +91,7 @@ module.exports.order = async (req, res) => {
                     'auth-token': 'Bearer ' + process.env.SHOP_API_TOKEN,
                     'Content-Type': 'application/json'
                 },
-                url: `${process.env.SHOP_API}/websiteservice/order`,
+                url: `${process.env.SHOP_API}/insuranceservice/order`,
                 data: data
             };
             const orderResponse = await axios.post(orderRequestConfig.url, data, {

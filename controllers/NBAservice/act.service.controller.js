@@ -78,6 +78,7 @@ module.exports.order = async (req, res) => {
                 customer_tel: req.body.customer_tel ? req.body.customer_tel : "",
                 customer_address: req.body.customer_address ? req.body.customer_address : "",
                 shopid: req.user._id,
+                shop_partner_type: req.body.shop_partner_type ? req.body.shop_partner_type: "",
                 product_detail: [{
                     packageid: id,
                     quantity: req.body.quantity
