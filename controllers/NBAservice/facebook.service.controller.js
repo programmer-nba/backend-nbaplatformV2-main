@@ -59,7 +59,7 @@ module.exports.order = async (req, res) => {
                 product_detail: [{
                     packageid: id,
                     quantity: req.body.quantity
-                }],
+                }]
             };
             console.log('useruseruser', data)
 
