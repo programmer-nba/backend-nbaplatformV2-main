@@ -14,8 +14,15 @@ module.exports.getMemberTeam = async (req, res) => {
                 const include = await Member.findOne({ _id: item })
                 uplineTel.push(include.tel);
             }
-
-            return res.status(200).send({ message: 'ดึงข้อมูลสำเร็จ', data: uplineTel })
+            
+            return res.status(200).send({
+                message: 'ดึงข้อมูลสำเร็จ',
+                data: {
+                    lv1: uplineTel[0] || null,
+                    lv2: uplineTel[1] || null,
+                    lv3: uplineTel[2] || null
+                }
+            })
         }
     } catch (error) {
         console.log(error)
