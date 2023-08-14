@@ -9,7 +9,7 @@ module.exports.getMemberTeam = async (req, res) => {
             return res.status(403).send({ message: 'เบอร์โทรนี้ยังไม่ได้เป็นสมาชิกของ NBA Platfrom' });
         } else {
             const upline = [member.upline.lv1, member.upline.lv2, member.upline.lv3];
-            console.log('uplineuplineuplineuplineuplineuplineupline', upline)
+            console.log('upline', upline)
             const validUplines = upline.filter(item => item !== '-');
             const uplineData = [];
             let i = 0;
