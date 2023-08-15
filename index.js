@@ -63,6 +63,9 @@ app.use('/v2/nba-platform/order', require('./routes/order'))
 // commission
 app.use('/v2/nba-platform/commission', require('./routes/commission'))
 
+// exchange
+app.use('/v2/nba-platform/exchangepoint', require('./routes/exchange/index'))
+
 //artwork
 app.use('/v2/nba-platform/artwork',require('./routes/artwork/artwork'));
 
