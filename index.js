@@ -58,7 +58,7 @@ app.use('/v2/nba-platform/counter_service/wallet',require('./routes/counterservi
 app.use('/v2/nba-platform/nbaservice', require('./routes/NBAservice/index'))
 
 // Order
-app.use('/v2/nba-platform/orderservice', require('./routes/NBAservice/order'))
+app.use('/v2/nba-platform/order', require('./routes/order'))
 
 //artwork
 app.use('/v2/nba-platform/artwork',require('./routes/artwork/artwork'));
