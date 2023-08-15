@@ -60,6 +60,9 @@ app.use('/v2/nba-platform/nbaservice', require('./routes/NBAservice/index'))
 // Order
 app.use('/v2/nba-platform/order', require('./routes/order'))
 
+// commission
+app.use('/v2/nba-platform/commission', require('./routes/commission'))
+
 //artwork
 app.use('/v2/nba-platform/artwork',require('./routes/artwork/artwork'));
 
