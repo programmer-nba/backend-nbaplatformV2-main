@@ -5,6 +5,7 @@ const accountservice = require('../../controllers/NBAservice/account.service.con
 const actservice = require('../../controllers/NBAservice/act.service.controller')
 const itsupportservice = require('../../controllers/NBAservice/itsupport.service.controller')
 const insuranceservice = require('../../controllers/NBAservice/insurance.sservcie.controller')
+const taxservice = require('../../controllers/NBAservice/tax.service.controller')
 const auth  = require('../../middleware/auth')
 
 //facebookservice
@@ -33,5 +34,10 @@ router.post("/itsupportservice/order", auth, itsupportservice.order)
 router.get("/insuranceservice/list", auth, insuranceservice.GetService)
 router.get("/insuranceservice/package/listbycate/:id", auth, insuranceservice.GetServiceByCateId)
 router.post("/insuranceservice/order", auth, insuranceservice.order)
+
+//taxservice
+router.get("/taxservice/list", auth, taxservice.GetService)
+router.get("/taxservice/package/listbycate/:id", auth, taxservice.GetServiceByCateId)
+// router.post("/taxservice/order", auth, taxservice.order)
 
 module.exports = router
