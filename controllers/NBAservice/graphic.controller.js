@@ -12,10 +12,10 @@ module.exports.order = async (req, res) => {
                 'auth-token': process.env.SHOP_API_TOKEN,
                 'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/facebookservice/list/${id}`,
+            url: `${process.env.SHOP_API}/artwork/product-graphic/price/byid/${id}`,
         };
         const packageResponse = await axios(packageRequestData);
-        console.log(packageResponse.data);
+        console.log(packageResponse.data.data);
         if (packageResponse) {
             // Check user wallet
             const token = req.headers['token'];
@@ -43,7 +43,9 @@ module.exports.order = async (req, res) => {
                 branch_id: req.body.branch_id ? req.body.branch_id: "",
                 product_detail: [{
                     packageid: id,
-                    quantity: req.body.product_detail[0].quantity
+                    quantity: req.body.product_detail[0].quantity,
+                    width: req.body.product_detail[0].width,
+                    hight: req.body.product_detail[0].hight
                 }],
                 paymenttype: req.body.paymenttype,
                 moneyreceive: req.body.moneyreceive,
@@ -54,7 +56,7 @@ module.exports.order = async (req, res) => {
                     'auth-token': 'Bearer ' + process.env.SHOP_API_TOKEN,
                     'Content-Type': 'application/json'
                 },
-                url: `${process.env.SHOP_API}/facebookservice/order`,
+                url: `${process.env.SHOP_API}/artwork/product-graphic/order`,
                 data: data
             };
             const orderResponse = await axios.post(orderRequestConfig.url, data, {
