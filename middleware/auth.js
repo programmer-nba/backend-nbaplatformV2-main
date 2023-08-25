@@ -21,7 +21,8 @@ const verifyToken = async (req, res, next)=>{
             return res.status(403).send({status: false, message: "No permission"})
         }
     }catch(err){
-        return res.status(401).send({status: false, message: "Internal server error"})
+        console.error(err);
+        return res.status(401).send({status: false, message: "Authenticate error"})
     }
 }
 
