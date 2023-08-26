@@ -3,7 +3,6 @@ const axios = require('axios');
 module.exports.GetCommissionByTel = async (req, res) => {
     try {
         const tel = req.user.tel
-
         console.log("req.params.telreq.params.telreq.params.telreq.params.tel", req.params.tel)
         const request = {
             method: 'get',
