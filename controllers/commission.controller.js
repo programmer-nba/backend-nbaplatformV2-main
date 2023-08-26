@@ -3,13 +3,16 @@ const axios = require('axios');
 module.exports.GetCommissionByTel = async (req, res) => {
     try {
         const tel = req.user.tel
+
         console.log("req.params.telreq.params.telreq.params.telreq.params.tel", req.params.tel)
         const request = {
             method: 'get',
             headers: {
-                'auth-token': process.env.SHOP_API_TOKEN
+                'auth-token': process.env.SHOP_API_TOKEN,
+                'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/commission/totalcommission/${tel}`,
+            url: `${process.env.SHOP_API}/commission/totalcommission`,
+            data: { tel: tel }
         }
         await axios(request).then(async (response) => {
             console.log(response)
@@ -27,9 +30,11 @@ module.exports.GetUnsummedCommissionsByTel = async (req, res) => {
         const request = {
             method: 'get',
             headers: {
-                'auth-token': process.env.SHOP_API_TOKEN
+                'auth-token': process.env.SHOP_API_TOKEN,
+                'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/commission/list/${tel}`,
+            url: `${process.env.SHOP_API}/commission/list`,
+            data: { tel: tel }
         }
         await axios(request).then(async (response) => {
             console.log(response)
@@ -48,9 +53,11 @@ module.exports.GetUserAllSale = async (req, res) => {
             
             method: 'get',
             headers: {
-                'auth-token': process.env.SHOP_API_TOKEN
+                'auth-token': process.env.SHOP_API_TOKEN,
+                'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/orderservice/allsale/${tel}`,
+            url: `${process.env.SHOP_API}/orderservice/allsale`,
+            data: { tel: tel }
         }
         await axios(request).then(async (response) => {
             console.log(response.data)
@@ -104,19 +111,22 @@ module.exports.GetAll = async (req, res) => {
 module.exports.GetHappyPointBytel = async (req, res) => {
     try {
         const tel = req.user.tel
+
         const request = {
             method: 'get',
             headers: {
-                'auth-token': process.env.SHOP_API_TOKEN
+                'auth-token': process.env.SHOP_API_TOKEN,
+                'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/commission/happypoint/${tel}`,
+            url: `${process.env.SHOP_API}/commission/happypoint`,
+            data: { tel: tel }
         }
         await axios(request).then(async (response) => {
             console.log(response.data)
             return res.status(200).send(response.data)
         })
     } catch (error) {
-        console.error(error);
+        console.error(error.message);
         return res.status(403).send({ code: error.code, data: error.message });
     };
 }
