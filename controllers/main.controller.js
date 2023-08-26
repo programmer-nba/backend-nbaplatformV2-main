@@ -111,9 +111,7 @@ exports.login = async(req, res)=>{
 
             }
 
-            const token = jwt.sign(payload, `${process.env.TOKEN_KEY}`,{
-                expiresIn: '30m'
-            })
+            const token = jwt.sign(payload, `${process.env.TOKEN_KEY}`)
             await LoginHistory.create({mem_id: member._id, ip_address: ip_address, timestamp: dayjs(Date.now()).format()})
             await TokenList.create({mem_id: member._id, token: token, timestamp: dayjs(Date.now()).format()})
             return res.status(200).send({status: true, token : token});
