@@ -32,7 +32,7 @@ module.exports.GetUnsummedCommissionsByTel = async (req, res) => {
                 'auth-token': process.env.SHOP_API_TOKEN,
                 'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/commission/list`,
+            url: `${process.env.SHOP_API}/commission/listcommission`,
             data: { tel: tel }
         }
         await axios(request).then(async (response) => {

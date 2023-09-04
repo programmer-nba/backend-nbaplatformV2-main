@@ -12,4 +12,5 @@ router.get('/login_history', auth, member.login_history);
 router.get('/online_device', auth,member.online_device);
 router.delete('/online_device/:id', auth, member.delete_device);
 router.post('/confirm', authpublic, member.confirm);
+
 module.exports = router;
