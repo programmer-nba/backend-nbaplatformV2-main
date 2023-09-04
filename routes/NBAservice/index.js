@@ -39,7 +39,7 @@ router.post("/insuranceservice/order", auth, insuranceservice.order)
 //taxservice
 router.get("/taxservice/list", auth, taxservice.GetService)
 router.get("/taxservice/package/listbycate/:id", auth, taxservice.GetServiceByCateId)
-// router.post("/taxservice/order", auth, taxservice.order)
+router.post("/taxservice/order", auth, taxservice.order)
 
 // graphic
 router.post("/graphic/order", auth, graphic.order)
