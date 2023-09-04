@@ -55,7 +55,7 @@ module.exports.GetUserAllSale = async (req, res) => {
                 'auth-token': process.env.SHOP_API_TOKEN,
                 'Content-Type': 'application/json'
             },
-            url: `${process.env.SHOP_API}/orderservice/allsale`,
+            url: `${process.env.SHOP_API}/commission/totalallsalebytel`,
             data: { tel: tel }
         }
         await axios(request).then(async (response) => {
