@@ -71,6 +71,7 @@ app.use('/v2/nba-platform/artwork',require('./routes/artwork/artwork'));
 
 //
 const port = process.env.PORT || 9010;
+
 app.listen(port, ()=>{
     console.log(`API Runing PORT ${port}`);
 });
