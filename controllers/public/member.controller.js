@@ -26,6 +26,34 @@ const validate_commission = (data) => {
   return schema.validate(data);
 };
 
+exports.getPhone = async (req, res) => {
+  try {
+    const tel = req.params.tel;
+    const member = await Member.findOne({tel: tel});
+    if (member) {
+      const res_data = {
+        name: member.name,
+        tel: member.tel,
+        address: member.address,
+        subdistrict: member.subdistrict,
+        district: member.district,
+        province: member.province,
+        postcode: member.postcode,
+        happy_point: member.happy_point,
+        allsale: member.allsale,
+      };
+      return res.status(200).send({status: true, data: res_data});
+    } else {
+      return res
+        .status(400)
+        .send({status: false, message: "ไม่มีสมาชิกเบอร์นี้ในระบบ"});
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({message: "มีบางอย่างผิดพลาด"});
+  }
+};
+
 exports.getByTel = async (req, res) => {
   try {
     const tel = req.params.tel;

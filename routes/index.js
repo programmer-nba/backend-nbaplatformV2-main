@@ -5,7 +5,7 @@ const authAdmin = require('../middleware/auth.admin')
 const authPassword = require('../middleware/auth.new_password');
 router.post('/register', main.register);
 router.post('/login', main.login);
-router.get('/me',auth, main.me);
+router.get('/me', auth, main.me);
 router.post('/logout', auth, main.logout);
 router.get('/token',authAdmin, main.genPublicToken);
 

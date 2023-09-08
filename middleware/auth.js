@@ -7,7 +7,6 @@ const verifyToken = async (req, res, next)=>{
     }
     try{
         const decoded = jwt.verify(token, `${process.env.TOKEN_KEY}`);
-        
         if(decoded){
             //check in token_list
             const check = await TokenList.findOne({mem_id:decoded._id, token: token})
