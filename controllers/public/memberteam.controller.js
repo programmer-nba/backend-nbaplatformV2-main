@@ -15,20 +15,23 @@ module.exports.getMemberTeam = async (req, res) => {
             let i = 0;
             for (const item of validUplines) {
                 const include = await Member.findOne({ _id: item });
-                uplineData.push({
-                    iden: include.iden.number,
-                    name: include.name,
-                    address: {
-                        address: include.address,
-                        subdistrict: include.subdistrict,
-                        district: include.district,
-                        province: include.province,
-                        postcode: include.postcode
-                    },
-                    tel: include.tel,
-                    level: (i+1)
-                });
-                i++;
+                console.log('include', include)
+                if(include !== null){
+                    uplineData.push({
+                        iden: include.iden.number,
+                        name: include.name,
+                        address: {
+                            address: include.address,
+                            subdistrict: include.subdistrict,
+                            district: include.district,
+                            province: include.province,
+                            postcode: include.postcode
+                        },
+                        tel: include.tel,
+                        level: (i+1)
+                    });
+                    i++;
+                }
             }
 
             const owner = {

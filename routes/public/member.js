@@ -10,6 +10,6 @@ router.get('/check/:tel', Member.getPhone);
 // router.post('/givecommission', auth, Member.giveCommission);
 // router.post('/givehappypoint', auth, Member.giveHappyPoint);
 // router.post('/transfer_member', Member.transferMember);
-router.get('/memberteam/:tel', authpartner, MemberTeam.getMemberTeam)
+router.get('/memberteam/:tel', MemberTeam.getMemberTeam)
 
 module.exports = router;
