@@ -1,9 +1,10 @@
 const axios = require('axios');
+const {Commission} = require("../models/commission.model");
 
 module.exports.GetCommissionByTel = async (req, res) => {
     try {
         const tel = req.user.tel
-        console.log("req.params.telreq.params.telreq.params.telreq.params.tel", req.params.tel)
+        console.log('เบอร์โทรศัพท์ : ', tel);
         const request = {
             method: 'get',
             headers: {
@@ -14,7 +15,6 @@ module.exports.GetCommissionByTel = async (req, res) => {
             data: { tel: tel }
         }
         await axios(request).then(async (response) => {
-            console.log(response)
             return res.status(200).send(response.data)
         })
     } catch (error) {
@@ -45,11 +45,10 @@ module.exports.GetUnsummedCommissionsByTel = async (req, res) => {
     };
 }
 
-module.exports.GetUserAllSale = async (req, res) => {
+module.exports.GetAllSaleByTel = async (req, res) => {
     try {
         const tel = req.user.tel
         const request = {
-            
             method: 'get',
             headers: {
                 'auth-token': process.env.SHOP_API_TOKEN,
@@ -67,6 +66,7 @@ module.exports.GetUserAllSale = async (req, res) => {
         return res.status(403).send({ code: error.code, data: error.message });
     };
 }
+
 
 module.exports.GetCommissionByOrderId = async (req, res) => {
     try {
