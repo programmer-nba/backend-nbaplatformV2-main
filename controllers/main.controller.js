@@ -102,15 +102,12 @@ exports.login = async(req, res)=>{
         const member = await Member.findOne({tel});
         if(member && (await bcrypt.compare(password, member.password))){
             console.log('เข้าสู่ระบบสำเร็จ');
-            
             const payload = {
                 _id:member._id,
                  auth: 'member',
                  name:member.name,
                  tel:member.tel
-
             }
-
             const token = jwt.sign(payload, `${process.env.TOKEN_KEY}`)
             await LoginHistory.create({mem_id: member._id, ip_address: ip_address, timestamp: dayjs(Date.now()).format()})
             await TokenList.create({mem_id: member._id, token: token, timestamp: dayjs(Date.now()).format()})
@@ -153,8 +150,6 @@ exports.me = async(req,res)=>{
         return res.status(500).send({message: 'มีบางอย่างผิดพลาด'})
     }
 }
-
-
 
 //แก้ไขหรือตั้งรหัสผ่านใหม่
 exports.setPassword = async(req, res)=>{

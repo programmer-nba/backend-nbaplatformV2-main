@@ -5,6 +5,6 @@ router.post('/', auth, user.addUser);
 router.get('/', auth, user.getAll);
 router.get('/:id', auth, user.getById);
 router.put('/:id', auth, user.editUser);
-router.delete('/:id', auth, user.delUser);
+router.delete('/delete/:id', auth, user.delUser);
 
 module.exports = router;
