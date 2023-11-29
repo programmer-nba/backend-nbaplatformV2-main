@@ -5,7 +5,7 @@ const {MoneyHistory} = require("../../models/money.history.model");
 const {MoneySavings} = require("../../models/money.savings.model");
 const dayjs = require("dayjs");
 const {NotifyMember} = require("../../models/member/notify.member.model");
-const { numberDigitFormat } = require("../../lib/format_function");
+const {numberDigitFormat} = require("../../lib/format_function");
 
 const validate_commission = (data) => {
   const schema = Joi.object({
@@ -24,34 +24,6 @@ const validate_commission = (data) => {
     emp_bonus: Joi.number().required().label("ไม่พบยอดโบนัสพนักงาน"),
   });
   return schema.validate(data);
-};
-
-exports.getPhone = async (req, res) => {
-  try {
-    const tel = req.params.tel;
-    const member = await Member.findOne({tel: tel});
-    if (member) {
-      const res_data = {
-        name: member.name,
-        tel: member.tel,
-        address: member.address,
-        subdistrict: member.subdistrict,
-        district: member.district,
-        province: member.province,
-        postcode: member.postcode,
-        happy_point: member.happy_point,
-        allsale: member.allsale,
-      };
-      return res.status(200).send({status: true, data: res_data});
-    } else {
-      return res
-        .status(400)
-        .send({status: false, message: "ไม่มีสมาชิกเบอร์นี้ในระบบ"});
-    }
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send({message: "มีบางอย่างผิดพลาด"});
-  }
 };
 
 exports.getByTel = async (req, res) => {
@@ -127,7 +99,9 @@ exports.giveCommission = async (req, res) => {
     const noti = {
       mem_id: member._id,
       topic: `รับเงิน ${numberDigitFormat(vat_owner.amount)}`,
-      detail: `${req.body.name} จำนวน ${numberDigitFormat(vat_owner.amount)} บาท (หักภาษี ณ ที่จ่ายเรียบร้อยแล้ว)`,
+      detail: `${req.body.name} จำนวน ${numberDigitFormat(
+        vat_owner.amount
+      )} บาท (หักภาษี ณ ที่จ่ายเรียบร้อยแล้ว)`,
       timestamp: dayjs(Date.now()).format(),
     };
     await NotifyMember.create(noti);
@@ -158,8 +132,10 @@ exports.giveCommission = async (req, res) => {
       //notify
       const notiLv1 = {
         mem_id: mem_lv1._id,
-        topic: `คอมมิชชั่น ${numberDigitFormat(vat_lv1.amount) }`,
-        detail: `ส่วนแบ่งจากผู้ใช้งานที่เราแนะนำ จำนวน ${numberDigitFormat(vat_lv1.amount)} บาท`,
+        topic: `คอมมิชชั่น ${numberDigitFormat(vat_lv1.amount)}`,
+        detail: `ส่วนแบ่งจากผู้ใช้งานที่เราแนะนำ จำนวน ${numberDigitFormat(
+          vat_lv1.amount
+        )} บาท`,
         timestamp: dayjs(Date.now()).format(),
       };
       await NotifyMember.create(notiLv1);
@@ -192,7 +168,9 @@ exports.giveCommission = async (req, res) => {
       const notiLv2 = {
         mem_id: mem_lv2._id,
         topic: `คอมมิชชั่น ${numberDigitFormat(vat_lv2.amount)}`,
-        detail: `ส่วนแบ่งจากผู้ใช้งานที่เราแนะนำ จำนวน ${numberDigitFormat(vat_lv2.amount) } บาท`,
+        detail: `ส่วนแบ่งจากผู้ใช้งานที่เราแนะนำ จำนวน ${numberDigitFormat(
+          vat_lv2.amount
+        )} บาท`,
         timestamp: dayjs(Date.now()).format(),
       };
       await NotifyMember.create(notiLv2);
@@ -225,7 +203,9 @@ exports.giveCommission = async (req, res) => {
       const notiLv3 = {
         mem_id: mem_lv3._id,
         topic: `คอมมิชชั่น ${numberDigitFormat(vat_lv3.amount)}`,
-        detail: `ส่วนแบ่งจากผู้ใช้งานที่เราแนะนำ จำนวน ${numberDigitFormat(vat_lv3.amount)} บาท`,
+        detail: `ส่วนแบ่งจากผู้ใช้งานที่เราแนะนำ จำนวน ${numberDigitFormat(
+          vat_lv3.amount
+        )} บาท`,
         timestamp: dayjs(Date.now()).format(),
       };
       await NotifyMember.create(notiLv3);
@@ -275,14 +255,16 @@ exports.giveHappyPoint = async (req, res) => {
         .status(400)
         .send({status: false, message: "เบอร์โทรนี้ยังไม่ได้สมัคร Platform"});
     }
-    
+
     const new_point = member.happy_point + req.body.point;
     await Member.findByIdAndUpdate(member._id, {happy_point: new_point});
     const noti_data = {
-      mem_id : member._id,
-      topic : `ได้รับคะแนน ${numberDigitFormat(req.body.point)} คะแนน`,
-      detail : `คุณได้รับคะแนนสะสม Happy Point ${numberDigitFormat(req.body.point)} คะแนน จากการใช้บริการร้านค้าหรือพันธมิตรทางธุรกิจในเครือบริษัท NBA Digital Service`
-    }
+      mem_id: member._id,
+      topic: `ได้รับคะแนน ${numberDigitFormat(req.body.point)} คะแนน`,
+      detail: `คุณได้รับคะแนนสะสม Happy Point ${numberDigitFormat(
+        req.body.point
+      )} คะแนน จากการใช้บริการร้านค้าหรือพันธมิตรทางธุรกิจในเครือบริษัท NBA Digital Service`,
+    };
     await NotifyMember.create(noti_data);
     return res
       .status(200)
@@ -382,6 +364,24 @@ exports.transferMember = async (req, res) => {
       status: true,
       message: `ทำรายการสำเร็จ ย้าย ${move} รายการ | อัพเดต : ${update} รายการ`,
     });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({message: "มีบางอย่างผิดพลาด"});
+  }
+};
+
+exports.getMemberAll = async (req, res) => {
+  try {
+    const members = await Member.find();
+    if (!members) {
+      return res
+        .status(404)
+        .send({status: false, message: "ดึงข้อมูลไม่สำเร็จ"});
+    } else {
+      return res
+        .status(200)
+        .send({status: true, message: "ดึงข้อมูลสำเร็จ", data: members});
+    }
   } catch (err) {
     console.log(err);
     return res.status(500).send({message: "มีบางอย่างผิดพลาด"});
