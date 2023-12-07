@@ -195,7 +195,7 @@ exports.me = async (req, res) => {
 };
 
 //แก้ไขหรือตั้งรหัสผ่านใหม่
-exports.setPassword = async (req, res) => {
+exports.resetPassword = async (req, res) => {
   try {
     const vali = (data) => {
       const schema = Joi.object({

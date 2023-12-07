@@ -10,5 +10,5 @@ router.post('/logout', auth, main.logout);
 router.get('/token',authAdmin, main.genPublicToken);
 
 //set new password
-router.post('/set_new_password', authPassword, main.setPassword);
+router.post('/reset_password', main.resetPassword);
 module.exports = router;
