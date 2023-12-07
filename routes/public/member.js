@@ -5,7 +5,7 @@ const auth = require("../../middleware/auth.public");
 const authpartner = require("../../middleware/auth_partner");
 
 router.get("/tel/:tel", Member.getByTel);
-router.post('/givecommission/:tel', Member.giveCommission);
+router.post('/givecommission', Member.giveCommission);
 // router.post('/givehappypoint', auth, Member.giveHappyPoint);
 // router.post('/transfer_member', Member.transferMember);
 router.get("/memberteam/:tel", MemberTeam.getMemberTeam);

@@ -68,7 +68,7 @@ exports.giveCommission = async (req, res) => {
     }
 
     // check เบอร์โทร
-    const tel = req.params.tel;
+    const tel = req.body.tel;
     const member = await Member.findOne({tel: tel});
     if (!member) {
       return res.status(400).json({
