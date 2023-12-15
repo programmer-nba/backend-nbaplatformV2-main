@@ -41,7 +41,8 @@ router.get("/taxservice/list", auth, taxservice.GetService)
 router.get("/taxservice/package/listbycate/:id", auth, taxservice.GetServiceByCateId)
 router.post("/taxservice/order", auth, taxservice.order)
 
-// graphic
+//graphic
+router.get("/graphic/list", auth, graphic.GetService)
 router.post("/graphic/order", auth, graphic.order)
 
 module.exports = router
