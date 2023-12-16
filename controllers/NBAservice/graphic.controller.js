@@ -15,7 +15,7 @@ module.exports.GetService = async (req, res) => {
     };
     await axios(request).then(async (response) => {
       console.log(response);
-      return res.status(200).send(response.data);
+      return res.status(200).send(response.data.data);
     });
   } catch (error) {
     console.log(error);
