@@ -25,11 +25,13 @@ module.exports.GetCommissionByTel = async (req, res) => {
 
 module.exports.GetUnsummedCommissionsByTel = async (req, res) => {
     try {
+        const token = req.headers.token;
+        console.log(token)
         const tel = req.user.tel
         const request = {
             method: 'get',
             headers: {
-                'auth-token': process.env.SHOP_API_TOKEN,
+                'auth-token': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             url: `${process.env.SHOP_API}/commission/listcommission`,
