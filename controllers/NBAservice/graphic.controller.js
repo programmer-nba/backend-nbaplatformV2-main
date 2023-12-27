@@ -4,17 +4,18 @@ const axios = require("axios");
 
 module.exports.GetService = async (req, res) => {
   try {
+    let token = req.headers["token"];
     var axios = require("axios");
     const request = {
       method: "get",
       headers: {
-        "auth-token": process.env.SHOP_API_TOKEN,
+        "auth-token": token,
         "Content-Type": "application/json",
       },
       url: `${process.env.SHOP_API}/artwork/product-graphic`,
     };
     await axios(request).then(async (response) => {
-      console.log(response);
+      console.log(response.data);
       return res.status(200).send(response.data.data);
     });
   } catch (error) {
@@ -26,7 +27,6 @@ module.exports.GetService = async (req, res) => {
 module.exports.order = async (req, res) => {
   try {
     const id = req.body.product_detail[0].packageid;
-
     const packageRequestData = {
       method: "get",
       headers: {
