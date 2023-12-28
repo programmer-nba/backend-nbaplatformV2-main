@@ -59,7 +59,7 @@ router.post("/taxservice/order", auth, taxservice.order);
 
 //graphic
 router.get("/graphic/list", auth, graphic.GetService);
-router.get("graphic/category/list", auth, graphic.GetCategory);
+router.get("/graphic/category/list", auth, graphic.GetCategory);
 router.post("/graphic/order", auth, graphic.order);
 
 module.exports = router;
