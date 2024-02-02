@@ -50,7 +50,6 @@ exports.register = async (req, res) => {
     const card_number = `888888${req.body.tel}`;
     const encrytedPassword = await bcrypt.hash(req.body.password, 10);
     if (req.body.ref_tel) {
-      console.log("มีเบอร์โทรคนแนะนำ");
       const memberRef = await Member.findOne({tel: req.body.ref_tel});
       if (memberRef) {
         const upline = {
@@ -58,7 +57,7 @@ exports.register = async (req, res) => {
           lv2: memberRef.upline.lv1,
           lv3: memberRef.upline.lv2,
         };
-        first_money = 0; //ยังไม่ให้เงินเริ่มต้น
+        // first_money = 0; //ยังไม่ให้เงินเริ่มต้น
         data = {
           ...req.body,
           money: first_money - (first_money * 7) / 100,
@@ -72,13 +71,6 @@ exports.register = async (req, res) => {
           message: "ไม่พบข้อมูลผู้แนะนำเบอร์โทรที่แนะนำนี้",
         });
       }
-    } else {
-      data = {
-        ...req.body,
-        card_number: card_number,
-        password: encrytedPassword,
-      };
-      console.log("ไม่มีคนแนะนำ");
     }
     //เพิ่มข้อมูลลงฐานข้อมูล
     const member = await Member.create(data);
