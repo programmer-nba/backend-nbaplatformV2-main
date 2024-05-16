@@ -1,13 +1,13 @@
-const {Member} = require("../../models/member.model");
+const { Member } = require("../../models/member.model");
 
 module.exports.getMemberTeam = async (req, res) => {
   try {
-    const member = await Member.findOne({tel: req.params.tel});
+    const member = await Member.findOne({ tel: req.params.tel });
 
     if (!member) {
       return res
         .status(403)
-        .send({message: "เบอร์โทรนี้ยังไม่ได้เป็นสมาชิกของ NBA Platfrom"});
+        .send({ message: "เบอร์โทรนี้ยังไม่ได้เป็นสมาชิกของ NBA Platfrom" });
     } else {
       const upline = [member.upline.lv1, member.upline.lv2, member.upline.lv3];
       console.log("upline", upline);
@@ -15,7 +15,7 @@ module.exports.getMemberTeam = async (req, res) => {
       const uplineData = [];
       let i = 0;
       for (const item of validUplines) {
-        const include = await Member.findOne({_id: item});
+        const include = await Member.findOne({ _id: item });
         console.log("include", include);
         if (include !== null) {
           uplineData.push({
@@ -61,6 +61,6 @@ module.exports.getMemberTeam = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    return res.status(400).send({message: "มีบางอย่างผิดพลาด"});
+    return res.status(400).send({ message: "มีบางอย่างผิดพลาด" });
   }
 };
